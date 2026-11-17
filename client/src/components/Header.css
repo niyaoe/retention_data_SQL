@@ -1,0 +1,200 @@
+
+/* =====================================
+   KITKAT HEADER
+===================================== */
+
+.rd-kit-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 64px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  background: #242424;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16);
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.rd-kit-header-left,
+.rd-kit-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.rd-kit-header-left {
+  gap: 12px;
+  min-width: 0;
+}
+
+.rd-kit-header-title h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.rd-kit-header-title span {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.rd-kit-header-right {
+  gap: 16px;
+}
+
+.rd-kit-profile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.rd-kit-profile-avatar {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 16px;
+}
+
+.rd-kit-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rd-kit-profile-info strong {
+  max-width: 150px;
+  overflow: hidden;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rd-kit-profile-info span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+
+.rd-kit-header-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.rd-kit-logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 3px;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rd-kit-logout-btn svg {
+  font-size: 15px;
+}
+
+.rd-kit-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* MOBILE MENU BUTTON */
+
+.rd-kit-menu-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .rd-kit-header {
+    min-height: 58px;
+    padding: 0 12px;
+  }
+
+  .rd-kit-menu-btn {
+    display: flex;
+  }
+
+  .rd-kit-header-title h1 {
+    font-size: 16px;
+  }
+
+  .rd-kit-header-title span {
+    font-size: 9px;
+  }
+
+  .rd-kit-header-right {
+    gap: 9px;
+  }
+
+  .rd-kit-profile-info {
+    display: none;
+  }
+
+  .rd-kit-header-divider {
+    display: none;
+  }
+
+  .rd-kit-logout-btn {
+    width: 35px;
+    min-width: 35px;
+    padding: 0;
+  }
+
+  .rd-kit-logout-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .rd-kit-header {
+    padding: 0 8px;
+  }
+
+  .rd-kit-header-left {
+    gap: 8px;
+  }
+
+  .rd-kit-header-title h1 {
+    font-size: 14px;
+  }
+
+  .rd-kit-header-title span {
+    font-size: 8px;
+  }
+}

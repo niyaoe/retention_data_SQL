@@ -1,0 +1,582 @@
+
+/* ==========================================
+   ANDROID 4.4.4 KITKAT DASHBOARD
+   Unique Prefix: rd-kitkat-dashboard-
+========================================== */
+
+.rd-kitkat-dashboard {
+  --rd-kd-orange: #ff5722;
+  --rd-kd-orange-dark: #e64a19;
+  --rd-kd-bg: #eeeeee;
+  --rd-kd-border: #d5d5d5;
+  --rd-kd-text: #303030;
+  --rd-kd-muted: #757575;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  overflow: hidden;
+
+  background: var(--rd-kd-bg);
+  color: var(--rd-kd-text);
+
+  font-family: Roboto, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.rd-kitkat-dashboard *,
+.rd-kitkat-dashboard *::before,
+.rd-kitkat-dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   WELCOME HEADER
+========================================== */
+
+.rd-kitkat-dashboard-welcome {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-shrink: 0;
+  min-height: 150px;
+
+  padding: 25px 30px;
+
+  overflow: hidden;
+
+  color: #fff;
+
+  background: linear-gradient(
+    110deg,
+    #ff5722,
+    #f4511e 60%,
+    #e64a19
+  );
+
+  border: 1px solid #e64a19;
+  border-radius: 3px;
+
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.rd-kitkat-dashboard-welcome-main {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.rd-kitkat-dashboard-kicker {
+  display: block;
+  margin-bottom: 10px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+
+  opacity: 0.85;
+}
+
+.rd-kitkat-dashboard-welcome h2 {
+  margin: 0 0 10px;
+
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 1.2;
+
+  overflow-wrap: anywhere;
+}
+
+.rd-kitkat-dashboard-user-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+}
+
+.rd-kitkat-dashboard-meta-dot {
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+
+  background: #fff;
+  border-radius: 50%;
+}
+
+.rd-kitkat-dashboard-welcome-mark {
+  position: absolute;
+  top: 50%;
+  right: 35px;
+
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 130px;
+  height: 130px;
+
+  color: rgba(255, 255, 255, 0.17);
+  font-size: 110px;
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   MODULE SECTION
+========================================== */
+
+.rd-kitkat-dashboard-modules {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  min-width: 0;
+  min-height: 0;
+
+  gap: 16px;
+  overflow: hidden;
+}
+
+.rd-kitkat-dashboard-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-shrink: 0;
+
+  padding-bottom: 12px;
+
+  border-bottom: 2px solid #d6d6d6;
+}
+
+.rd-kitkat-dashboard-section-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rd-kitkat-dashboard-section-heading h3 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.rd-kitkat-dashboard-section-heading > div span {
+  color: var(--rd-kd-muted);
+  font-size: 11px;
+}
+
+.rd-kitkat-dashboard-section-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 34px;
+  height: 28px;
+  padding: 0 8px;
+
+  color: #fff;
+  background: var(--rd-kd-orange);
+
+  border-radius: 2px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   MODULE GRID
+========================================== */
+
+.rd-kitkat-dashboard-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(145px, 1fr);
+
+  gap: 15px;
+
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+
+  align-content: start;
+  overflow: hidden;
+}
+
+.rd-kitkat-dashboard-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  min-width: 0;
+  min-height: 0;
+
+  padding: 20px;
+
+  color: var(--rd-kd-text);
+  text-decoration: none;
+
+  background: #fff;
+
+  border: 1px solid var(--rd-kd-border);
+  border-bottom: 3px solid #bdbdbd;
+  border-radius: 3px;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.rd-kitkat-dashboard-card:hover {
+  color: var(--rd-kd-text);
+  text-decoration: none;
+
+  border-bottom-color: var(--rd-kd-orange);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  transform: translateY(-2px);
+}
+
+.rd-kitkat-dashboard-card:focus-visible {
+  outline: 2px solid var(--rd-kd-orange);
+  outline-offset: 3px;
+}
+
+.rd-kitkat-dashboard-card-code {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+
+  color: #bdbdbd;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.rd-kitkat-dashboard-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+
+  margin-bottom: 16px;
+
+  color: #fff;
+  background: var(--rd-kd-orange);
+
+  border-radius: 3px;
+
+  font-size: 21px;
+}
+
+.rd-kitkat-dashboard-card-content {
+  min-width: 0;
+  padding-right: 20px;
+}
+
+.rd-kitkat-dashboard-card-content h4 {
+  margin: 0 0 6px;
+
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+
+  overflow-wrap: anywhere;
+}
+
+.rd-kitkat-dashboard-card-content p {
+  margin: 0;
+
+  color: var(--rd-kd-muted);
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+.rd-kitkat-dashboard-card-arrow {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  color: var(--rd-kd-orange);
+  background: #fff3ef;
+
+  border-radius: 2px;
+
+  font-size: 16px;
+
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.rd-kitkat-dashboard-card:hover
+.rd-kitkat-dashboard-card-arrow {
+  color: #fff;
+  background: var(--rd-kd-orange);
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.rd-kitkat-dashboard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-shrink: 0;
+
+  padding: 12px 2px 2px;
+
+  color: #888;
+  border-top: 1px solid var(--rd-kd-border);
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+  .rd-kitkat-dashboard {
+    padding: 16px;
+    gap: 17px;
+  }
+
+  .rd-kitkat-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(140px, 1fr);
+  }
+
+  .rd-kitkat-dashboard-card {
+    padding: 17px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .rd-kitkat-dashboard {
+    padding: 12px;
+    gap: 13px;
+  }
+
+  .rd-kitkat-dashboard-welcome {
+    min-height: 125px;
+    padding: 18px;
+  }
+
+  .rd-kitkat-dashboard-welcome h2 {
+    font-size: 22px;
+  }
+
+  .rd-kitkat-dashboard-welcome-mark {
+    right: 12px;
+    width: 90px;
+    height: 90px;
+    font-size: 75px;
+  }
+
+  .rd-kitkat-dashboard-modules {
+    gap: 12px;
+  }
+
+  .rd-kitkat-dashboard-grid {
+    gap: 10px;
+    grid-auto-rows: minmax(130px, 1fr);
+  }
+
+  .rd-kitkat-dashboard-card {
+    padding: 14px;
+  }
+
+  .rd-kitkat-dashboard-card-icon {
+    width: 37px;
+    height: 37px;
+    margin-bottom: 12px;
+    font-size: 18px;
+  }
+
+  .rd-kitkat-dashboard-card-content h4 {
+    font-size: 12px;
+  }
+
+  .rd-kitkat-dashboard-card-content p {
+    font-size: 10px;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 420px) {
+  .rd-kitkat-dashboard {
+    padding: 9px;
+    gap: 10px;
+  }
+
+  .rd-kitkat-dashboard-welcome {
+    min-height: 110px;
+    padding: 15px;
+  }
+
+  .rd-kitkat-dashboard-kicker {
+    margin-bottom: 7px;
+    font-size: 9px;
+  }
+
+  .rd-kitkat-dashboard-welcome h2 {
+    max-width: 220px;
+    font-size: 19px;
+  }
+
+  .rd-kitkat-dashboard-user-meta {
+    gap: 6px;
+    font-size: 9px;
+  }
+
+  .rd-kitkat-dashboard-welcome-mark {
+    right: 5px;
+    font-size: 60px;
+  }
+
+  .rd-kitkat-dashboard-section-heading h3 {
+    font-size: 15px;
+  }
+
+  .rd-kitkat-dashboard-section-heading > div {
+    gap: 7px;
+  }
+
+  .rd-kitkat-dashboard-section-heading > div span {
+    font-size: 10px;
+  }
+
+  .rd-kitkat-dashboard-grid {
+    gap: 8px;
+    grid-auto-rows: minmax(125px, 1fr);
+  }
+
+  .rd-kitkat-dashboard-card {
+    padding: 11px;
+  }
+
+  .rd-kitkat-dashboard-card-code {
+    top: 9px;
+    right: 9px;
+    font-size: 9px;
+  }
+
+  .rd-kitkat-dashboard-card-icon {
+    width: 33px;
+    height: 33px;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .rd-kitkat-dashboard-card-content {
+    padding-right: 5px;
+  }
+
+  .rd-kitkat-dashboard-card-content h4 {
+    font-size: 11px;
+  }
+
+  .rd-kitkat-dashboard-card-content p {
+    font-size: 9px;
+  }
+
+  .rd-kitkat-dashboard-card-arrow {
+    right: 9px;
+    bottom: 9px;
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+  }
+
+  .rd-kitkat-dashboard-footer {
+    font-size: 9px;
+  }
+}
+
+/* ==========================================
+   VERY SMALL SCREENS
+========================================== */
+
+@media (max-width: 340px) {
+  .rd-kitkat-dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(115px, auto);
+  }
+
+  .rd-kitkat-dashboard-card {
+    min-height: 115px;
+  }
+
+  .rd-kitkat-dashboard-card-content h4 {
+    font-size: 13px;
+  }
+
+  .rd-kitkat-dashboard-card-content p {
+    font-size: 10px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-kitkat-dashboard-card,
+  .rd-kitkat-dashboard-card-arrow {
+    transition: none;
+  }
+
+  .rd-kitkat-dashboard-card:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,408 @@
+
+/* ==========================================
+   ANDROID 4.4 KITKAT LOGIN THEME
+   Unique prefix: rd-kitkat-login-
+========================================== */
+
+.rd-kitkat-login-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 25px 16px;
+  background: #f2f2f2;
+  color: #333;
+  font-family: Roboto, "Segoe UI", Arial, sans-serif;
+}
+
+/* Background */
+
+.rd-kitkat-login-bg-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.45) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: .35;
+}
+
+.rd-kitkat-login-main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+/* Brand */
+
+.rd-kitkat-login-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  margin-bottom: 3px;
+}
+
+.rd-kitkat-login-logo {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: #ff5722;
+  color: #fff;
+  font-size: 23px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.16);
+}
+
+.rd-kitkat-login-brand-text h1 {
+  margin: 0;
+  color: #343434;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.rd-kitkat-login-brand-text span {
+  display: block;
+  margin-top: 3px;
+  color: #999;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+/* Login Card */
+
+.rd-kitkat-login-card {
+  width: 100%;
+  padding: 23px;
+  background: #fff;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.08);
+}
+
+.rd-kitkat-login-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 17px;
+}
+
+.rd-kitkat-login-card-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.rd-kitkat-login-card-header p {
+  margin: 5px 0 0;
+  color: #999;
+  font-size: 11px;
+}
+
+.rd-kitkat-login-header-icon {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0eb;
+  color: #ff5722;
+  font-size: 17px;
+}
+
+.rd-kitkat-login-accent-line {
+  width: 100%;
+  height: 2px;
+  margin-bottom: 20px;
+  background: linear-gradient(
+    90deg,
+    #ff5722 0%,
+    #ff5722 25%,
+    #eeeeee 25%,
+    #eeeeee 100%
+  );
+}
+
+/* Form */
+
+.rd-kitkat-login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rd-kitkat-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.rd-kitkat-login-field label {
+  color: #777;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .7px;
+}
+
+.rd-kitkat-login-input-wrap {
+  height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 11px;
+  background: #fafafa;
+  border: 1px solid #d8d8d8;
+  border-radius: 3px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.rd-kitkat-login-input-wrap:focus-within {
+  background: #fff;
+  border-color: #ff7043;
+  box-shadow: 0 0 0 2px rgba(255,87,34,.10);
+}
+
+.rd-kitkat-login-input-icon {
+  flex-shrink: 0;
+  color: #999;
+  font-size: 16px;
+}
+
+.rd-kitkat-login-input-wrap input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #333;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.rd-kitkat-login-input-wrap input::placeholder {
+  color: #aaa;
+}
+
+.rd-kitkat-login-eye {
+  width: 27px;
+  height: 30px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.rd-kitkat-login-eye:hover {
+  color: #ff5722;
+}
+
+/* Error */
+
+.rd-kitkat-login-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #f0c4bd;
+  border-radius: 3px;
+  background: #fff2ef;
+  color: #c0392b;
+  font-size: 11px;
+}
+
+.rd-kitkat-login-error span {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d94b3b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Sign In Button */
+
+.rd-kitkat-login-submit {
+  width: 100%;
+  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 2px;
+  border: 1px solid #ed4d1a;
+  border-radius: 3px;
+  background: linear-gradient(
+    180deg,
+    #ff7043 0%,
+    #ff5722 100%
+  );
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.2),
+    0 2px 3px rgba(0,0,0,.12);
+  transition: all .15s ease;
+}
+
+.rd-kitkat-login-submit:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    #ff8059 0%,
+    #f4511e 100%
+  );
+  box-shadow: 0 3px 7px rgba(255,87,34,.22);
+}
+
+.rd-kitkat-login-submit:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.15);
+}
+
+.rd-kitkat-login-submit:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+}
+
+/* Loading Spinner */
+
+.rd-kitkat-login-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rdKitkatLoginSpin .7s linear infinite;
+}
+
+@keyframes rdKitkatLoginSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Security Footer */
+
+.rd-kitkat-login-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 19px;
+  padding-top: 13px;
+  border-top: 1px solid #eeeeee;
+  color: #aaa;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .8px;
+}
+
+.rd-kitkat-login-security svg {
+  color: #ff7043;
+  font-size: 13px;
+}
+
+/* Page Footer */
+
+.rd-kitkat-login-footer {
+  display: flex;
+  justify-content: space-between;
+  color: #aaa;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .8px;
+}
+
+/* Keyboard focus */
+
+.rd-kitkat-login-submit:focus-visible,
+.rd-kitkat-login-eye:focus-visible {
+  outline: 2px solid #ff5722;
+  outline-offset: 3px;
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+  .rd-kitkat-login-page {
+    padding: 20px 15px;
+  }
+
+  .rd-kitkat-login-main {
+    max-width: 360px;
+    gap: 16px;
+  }
+
+  .rd-kitkat-login-card {
+    padding: 20px 17px;
+  }
+
+  .rd-kitkat-login-brand-text h1 {
+    font-size: 17px;
+  }
+
+  .rd-kitkat-login-card-header h2 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 350px) {
+  .rd-kitkat-login-card {
+    padding: 17px 13px;
+  }
+
+  .rd-kitkat-login-brand-text h1 {
+    font-size: 15px;
+  }
+
+  .rd-kitkat-login-footer {
+    font-size: 8px;
+  }
+}
+
+@media (max-height: 550px) and (min-width: 600px) {
+  .rd-kitkat-login-page {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .rd-kitkat-login-main {
+    margin: auto;
+    gap: 12px;
+  }
+
+  .rd-kitkat-login-card {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .rd-kitkat-login-card form {
+    gap: 11px;
+  }
+}

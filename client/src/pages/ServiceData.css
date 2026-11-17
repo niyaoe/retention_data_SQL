@@ -1,0 +1,533 @@
+/* ==========================================
+   SERVICE DATA
+   Android 4.4.4 KitKat Theme
+   Unique CSS: rd-kit-service-data-
+========================================== */
+
+.rd-kit-service-data {
+  --rssd-orange: #ff5722;
+  --rssd-orange-dark: #e64a19;
+  --rssd-card: #ffffff;
+  --rssd-text: #303030;
+  --rssd-muted: #777777;
+  --rssd-border: #dedede;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
+  color: var(--rssd-text);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rd-kit-service-data *,
+.rd-kit-service-data *::before,
+.rd-kit-service-data *::after {
+  box-sizing: border-box;
+}
+
+/* HEADER */
+
+.rd-kit-service-data .rd-kit-service-data-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-title {
+  min-width: 0;
+}
+
+.rd-kit-service-data .rd-kit-service-data-breadcrumb {
+  color: var(--rssd-orange);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-title h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: #292929;
+}
+
+.rd-kit-service-data .rd-kit-service-data-title p {
+  margin: 5px 0 0;
+  color: var(--rssd-muted);
+  font-size: 12px;
+}
+
+/* HEADER COUNTS */
+
+.rd-kit-service-data .rd-kit-service-data-header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+  min-width: 0;
+}
+
+.rd-kit-service-data .rd-kit-service-data-counts {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-counts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 13px;
+  border-left: 1px solid var(--rssd-border);
+}
+
+.rd-kit-service-data .rd-kit-service-data-counts span {
+  color: #888;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rd-kit-service-data .rd-kit-service-data-counts strong {
+  color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* REFRESH */
+
+.rd-kit-service-data .rd-kit-service-data-refresh {
+  min-height: 36px;
+  padding: 8px 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: 3px;
+  background: var(--rssd-orange);
+  color: white;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rd-kit-service-data .rd-kit-service-data-refresh:hover:not(:disabled) {
+  background: var(--rssd-orange-dark);
+}
+
+.rd-kit-service-data .rd-kit-service-data-refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* TABLE CARD */
+
+.rd-kit-service-data .rd-kit-service-data-card {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--rssd-card);
+  border: 1px solid var(--rssd-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+.rd-kit-service-data .rd-kit-service-data-card-heading {
+  flex-shrink: 0;
+}
+
+/* CARD HEADER */
+
+.rd-kit-service-data .rd-kit-service-data-card-heading {
+  min-height: 62px;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.rd-kit-service-data .rd-kit-service-data-card-heading h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rd-kit-service-data .rd-kit-service-data-card-heading h3 svg {
+  color: var(--rssd-orange);
+  font-size: 17px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-card-heading p {
+  margin: 5px 0 0;
+  color: #888;
+  font-size: 11px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-record-count {
+  padding: 6px 9px;
+  border-radius: 3px;
+  background: #fff0e9;
+  color: var(--rssd-orange-dark);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* TABLE SCROLL */
+
+.rd-kit-service-data .rd-kit-service-data-table-scroll {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: none;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* TABLE */
+
+.rd-kit-service-data .rd-kit-service-data-table {
+  width: 100%;
+  min-width: 1350px;
+  border-collapse: collapse;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 11px 12px;
+  background: #eee;
+  color: #444;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  border-bottom: 1px solid #d5d5d5;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table td {
+  padding: 10px 12px;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  font-size: 11px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table tbody tr:hover {
+  background: #fff3ed;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table td:first-child {
+  color: #999;
+  font-size: 10px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table td.rd-kit-service-data-ro {
+  color: #303030;
+  font-weight: 700;
+}
+
+.rd-kit-service-data .rd-kit-service-data-table td.rd-kit-service-data-empty {
+  padding: 35px 15px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+}
+
+/* LOADING */
+
+.rd-kit-service-data .rd-kit-service-data-message {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #777;
+  font-size: 12px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-message svg {
+  color: var(--rssd-orange);
+}
+
+/* ERROR */
+
+.rd-kit-service-data .rd-kit-service-data-error {
+  min-height: 150px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #c62828;
+  font-size: 12px;
+  text-align: center;
+}
+
+.rd-kit-service-data .rd-kit-service-data-error button {
+  padding: 7px 15px;
+  border: none;
+  border-radius: 3px;
+  background: var(--rssd-orange);
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* PAGINATION */
+
+.rd-kit-service-data .rd-kit-service-data-pagination {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 2px 0;
+  margin-top: 3px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-pagination > span {
+  color: #777;
+  font-size: 11px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rd-kit-service-data .rd-kit-service-data-pagination-buttons button {
+  min-height: 34px;
+  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid var(--rssd-border);
+  border-radius: 3px;
+  background: white;
+  color: #555;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rd-kit-service-data
+  .rd-kit-service-data-pagination-buttons
+  button:hover:not(:disabled) {
+  border-color: var(--rssd-orange);
+  color: var(--rssd-orange);
+}
+
+.rd-kit-service-data .rd-kit-service-data-pagination-buttons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* SPINNER */
+
+.rd-kit-service-data .rd-kit-service-data-spin {
+  animation: rssd-spin 0.7s linear infinite;
+}
+
+@keyframes rssd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* TABLET */
+
+@media (max-width: 1024px) {
+  .rd-kit-service-data {
+    padding: 13px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-header {
+    align-items: flex-start;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-header-right {
+    flex-wrap: wrap;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts {
+    gap: 10px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .rd-kit-service-data {
+    padding: 10px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-header-right {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts > div {
+    padding-left: 8px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts strong {
+    font-size: 14px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-title h2 {
+    font-size: 19px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-table-scroll {
+    max-height: none;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-pagination {
+    flex-shrink: 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-pagination-buttons {
+    width: 100%;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-pagination-buttons button {
+    flex: 1;
+    min-height: 40px;
+  }
+}
+
+/* SMALL ANDROID PHONES */
+
+@media (max-width: 420px) {
+  .rd-kit-service-data {
+    padding: 8px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-title h2 {
+    font-size: 17px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-title p {
+    font-size: 11px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-header-right {
+    gap: 8px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts {
+    gap: 6px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts > div {
+    padding-left: 6px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts span {
+    font-size: 9px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts strong {
+    font-size: 12px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-refresh {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-card-heading {
+    padding: 11px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-card-heading h3 {
+    font-size: 13px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-card-heading p {
+    font-size: 10px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-record-count {
+    font-size: 9px;
+    padding: 5px 6px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-pagination > span {
+    font-size: 10px;
+  }
+}
+
+/* VERY SMALL SCREENS */
+
+@media (max-width: 360px) {
+  .rd-kit-service-data {
+    padding: 6px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts {
+    gap: 4px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-counts strong {
+    font-size: 11px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-refresh {
+    padding: 6px 7px;
+  }
+
+  .rd-kit-service-data .rd-kit-service-data-card-heading {
+    align-items: flex-start;
+  }
+}
