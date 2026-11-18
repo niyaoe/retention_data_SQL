@@ -24,6 +24,10 @@ const salesApiSyncRoutes = require("./routes/salesApiSyncRoutes");
 const serviceExcelRoutes = require("./routes/serviceExcelRoutes");
 const { startSalesAutoSync } = require("./services/salesAutoSyncService");
 const dmsRetailRoutes = require("./routes/dmsRetailRoutes");
+const serviceApiSyncRoutes = require("./routes/serviceApiSyncRoutes");
+const {
+  startServiceApiAutoSync,
+} = require("./services/serviceApiAutoSyncService");
 const {
   startDmsRetailAutoSync,
 } = require("./services/dmsRetailAutoSyncService");
@@ -57,6 +61,7 @@ app.use("/api/model-import", modelImportRoutes);
 app.use("/api/sales-api-sync", salesApiSyncRoutes);
 app.use("/api/service-excel", serviceExcelRoutes);
 app.use("/api/dms-retail", dmsRetailRoutes);
+app.use("/api/service-api-sync", serviceApiSyncRoutes);
 
 
 const PORT = process.env.PORT || 5000;
@@ -71,9 +76,9 @@ const startServer = async () => {
 
       startSalesAutoSync();
       startDmsRetailAutoSync();
+      startServiceApiAutoSync();
 
-      // Start automatic SQL → MongoDB synchronization
-      // startAutoSync();
+      
     });
   } catch (error) {
     console.error("Server startup failed:", error.message);

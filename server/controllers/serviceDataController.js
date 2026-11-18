@@ -28,6 +28,7 @@ const getServiceData = async (req, res) => {
         ro_date,
         registration_number,
         chassis_number,
+        pincode,
         service_category,
         service_type,
         ro_service_advisor,
