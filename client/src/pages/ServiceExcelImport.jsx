@@ -1,4 +1,3 @@
-
 import { useRef, useState } from "react";
 import {
   FiUpload,
@@ -16,8 +15,7 @@ import {
 import api from "../services/api";
 import "./ServiceExcelImport.css";
 
-const formatNumber = (value) =>
-  Number(value || 0).toLocaleString("en-IN");
+const formatNumber = (value) => Number(value || 0).toLocaleString("en-IN");
 
 export default function ServiceExcelImport() {
   const fileInputRef = useRef(null);
@@ -79,17 +77,17 @@ export default function ServiceExcelImport() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await api.post(
-        "/service-excel/preview",
-        formData
-      );
+      const response = await api.post("/service-excel/preview", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setPreview(response.data);
       setSuccess("Excel file validated successfully.");
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          "Unable to generate Excel preview."
+        err.response?.data?.message || "Unable to generate Excel preview.",
       );
     } finally {
       setLoading(false);
@@ -112,7 +110,7 @@ export default function ServiceExcelImport() {
         "Existing RO numbers will be updated.\n" +
         "New RO numbers will be inserted.\n" +
         "Records absent from Excel will be preserved.\n" +
-        "RO dates will be set to blank for imported records."
+        "RO dates will be set to blank for imported records.",
     );
 
     if (!confirmed) return;
@@ -126,20 +124,19 @@ export default function ServiceExcelImport() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await api.post(
-        "/service-excel/upsert",
-        formData,
-        {
-          timeout: 0,
-        }
-      );
+      const response = await api.post("/service-excel/upsert", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 0,
+      });
 
       setImportResult(response.data);
       setSuccess(response.data.message);
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Service Data import failed. Please try again."
+          "Service Data import failed. Please try again.",
       );
     } finally {
       setImporting(false);
@@ -170,9 +167,7 @@ export default function ServiceExcelImport() {
 
           <h2>Service Excel Import</h2>
 
-          <p>
-            Upload, validate and update Service Data from Excel.
-          </p>
+          <p>Upload, validate and update Service Data from Excel.</p>
         </div>
 
         <button
@@ -213,8 +208,8 @@ export default function ServiceExcelImport() {
         <div>
           <strong>UPSERT import mode</strong>
           <p>
-            Existing RO numbers are updated, new records are inserted,
-            and records missing from Excel are preserved.
+            Existing RO numbers are updated, new records are inserted, and
+            records missing from Excel are preserved.
           </p>
         </div>
       </div>
@@ -226,9 +221,7 @@ export default function ServiceExcelImport() {
             <p>Select your Service Data workbook.</p>
           </div>
 
-          <span className="rd-kit-service-import-format">
-            XLSX / XLS
-          </span>
+          <span className="rd-kit-service-import-format">XLSX / XLS</span>
         </div>
 
         <div
@@ -259,9 +252,7 @@ export default function ServiceExcelImport() {
 
               <strong>{file.name}</strong>
 
-              <span>
-                {(file.size / (1024 * 1024)).toFixed(2)} MB
-              </span>
+              <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
 
               <button
                 type="button"
@@ -416,8 +407,8 @@ export default function ServiceExcelImport() {
               </div>
 
               <p>
-                The record with the latest invoice date will be imported
-                for each duplicate RO number.
+                The record with the latest invoice date will be imported for
+                each duplicate RO number.
               </p>
             </div>
           )}
@@ -452,9 +443,7 @@ export default function ServiceExcelImport() {
                   {preview.preview?.map((record, index) => (
                     <tr key={`${record.repair_order_number}-${index}`}>
                       <td>{record.bill_date || "—"}</td>
-                      <td className="strong">
-                        {record.repair_order_number}
-                      </td>
+                      <td className="strong">{record.repair_order_number}</td>
                       <td>{record.dealer_location || "—"}</td>
                       <td>{record.registration_number || "—"}</td>
                       <td>{record.chassis_number || "—"}</td>
@@ -463,9 +452,7 @@ export default function ServiceExcelImport() {
                       <td>{record.ro_service_advisor || "—"}</td>
                       <td>{record.product_name || "—"}</td>
                       <td>
-                        <span className="rd-kit-service-import-null">
-                          NULL
-                        </span>
+                        <span className="rd-kit-service-import-null">NULL</span>
                       </td>
                     </tr>
                   ))}
@@ -490,8 +477,8 @@ export default function ServiceExcelImport() {
           <div>
             <strong>Import is running...</strong>
             <p>
-              Processing Excel records in batches. Please keep this page
-              open and do not submit another import.
+              Processing Excel records in batches. Please keep this page open
+              and do not submit another import.
             </p>
           </div>
         </div>
@@ -510,9 +497,7 @@ export default function ServiceExcelImport() {
           <div className="rd-kit-service-import-result-grid">
             <div>
               <span>Submitted Rows</span>
-              <strong>
-                {formatNumber(importResult.report.submittedRows)}
-              </strong>
+              <strong>{formatNumber(importResult.report.submittedRows)}</strong>
             </div>
 
             <div>
@@ -524,9 +509,7 @@ export default function ServiceExcelImport() {
 
             <div>
               <span>Duplicates Removed</span>
-              <strong>
-                {formatNumber(importResult.report.duplicateRows)}
-              </strong>
+              <strong>{formatNumber(importResult.report.duplicateRows)}</strong>
             </div>
 
             <div>

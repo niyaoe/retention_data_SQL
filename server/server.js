@@ -78,7 +78,7 @@ const startServer = async () => {
       startDmsRetailAutoSync();
       startServiceApiAutoSync();
 
-      
+
     });
   } catch (error) {
     console.error("Server startup failed:", error.message);

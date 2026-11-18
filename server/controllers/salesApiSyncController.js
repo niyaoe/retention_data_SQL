@@ -81,6 +81,64 @@ function parseDate(value) {
   return `${year}-${month}-${day}`;
 }
 
+
+async function fetchSalesCsv() {
+  const maxAttempts = 3;
+  const timeoutMs = 300000; // 5 minutes
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      console.log(
+        `[SALES SYNC] Fetching API. Attempt ${attempt}/${maxAttempts}`
+      );
+
+      const response = await fetch(API_URL, {
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: {
+          Accept: "text/csv,text/plain,*/*",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status >= 500 && attempt < maxAttempts) {
+          console.log(`[SALES SYNC] HTTP ${response.status}. Retrying...`);
+          await new Promise(resolve => setTimeout(resolve, attempt * 5000));
+          continue;
+        }
+
+        throw new Error(`Sales API returned HTTP ${response.status}`);
+      }
+
+      const csvText = await response.text();
+
+      if (!csvText.trim()) {
+        throw new Error("Sales API returned an empty response.");
+      }
+
+      console.log(
+        `[SALES SYNC] CSV downloaded successfully (${csvText.length} characters).`
+      );
+
+      return csvText;
+
+    } catch (error) {
+      console.error(
+        `[SALES SYNC] Attempt ${attempt} failed:`,
+        error.message
+      );
+
+      if (attempt === maxAttempts) {
+        throw error;
+      }
+
+      await new Promise(resolve =>
+        setTimeout(resolve, attempt * 10000)
+      );
+    }
+  }
+}
+
+
 // Shared function for manual and automatic sync.
 async function runSalesSync() {
   let connection;
@@ -102,17 +160,9 @@ async function runSalesSync() {
 
     lockAcquired = true;
 
-    // 1. Fetch API CSV.
-    const response = await fetch(API_URL, {
-      signal: AbortSignal.timeout(120000),
-      headers: { Accept: "text/csv,text/plain,*/*" },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Sales API returned HTTP ${response.status}`);
-    }
-
-    const csvText = await response.text();
+    
+    // 1. Fetch API CSV with timeout and automatic retries.
+    const csvText = await fetchSalesCsv();
 
     if (!csvText.trim()) {
       throw new Error("Sales API returned an empty response.");
