@@ -14,6 +14,7 @@ import BranchManagement from "./pages/BranchManagement";
 import SalesExcelImport from "./pages/SalesExcelImport";
 import ModelManagement from "./pages/ModelManagement";
 import ServiceExcelImport from "./pages/ServiceExcelImport";
+import DmsRetail from "./pages/DmsRetail";
 
 function AdminOnly({ children }) {
   const { user } = useOutletContext();
@@ -58,6 +59,9 @@ function App() {
           <Route path="/service-data" element={<ServiceData />} />
 
           <Route path="/sales-master" element={<SalesMaster />} />
+
+          <Route path="dms-retail" element={<DmsRetail />} />
+
           <Route
             path="/sales-import"
             element={

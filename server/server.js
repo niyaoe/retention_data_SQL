@@ -23,6 +23,10 @@ const modelImportRoutes = require("./routes/modelImportRoutes");
 const salesApiSyncRoutes = require("./routes/salesApiSyncRoutes");
 const serviceExcelRoutes = require("./routes/serviceExcelRoutes");
 const { startSalesAutoSync } = require("./services/salesAutoSyncService");
+const dmsRetailRoutes = require("./routes/dmsRetailRoutes");
+const {
+  startDmsRetailAutoSync,
+} = require("./services/dmsRetailAutoSyncService");
 
 const app = express();
 
@@ -52,6 +56,7 @@ app.use("/api/models", modelRoutes);
 app.use("/api/model-import", modelImportRoutes);
 app.use("/api/sales-api-sync", salesApiSyncRoutes);
 app.use("/api/service-excel", serviceExcelRoutes);
+app.use("/api/dms-retail", dmsRetailRoutes);
 
 
 const PORT = process.env.PORT || 5000;
@@ -65,6 +70,7 @@ const startServer = async () => {
       console.log(`Server running on port ${PORT}`);
 
       startSalesAutoSync();
+      startDmsRetailAutoSync();
 
       // Start automatic SQL → MongoDB synchronization
       // startAutoSync();

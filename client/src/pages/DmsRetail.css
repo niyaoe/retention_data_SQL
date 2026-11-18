@@ -1,0 +1,793 @@
+
+/* ==========================================
+   DMS RETAIL
+   Android 4.4.4 KitKat Inspired Theme
+   Unique CSS: rd-kit-dms-
+========================================== */
+
+.rd-kit-dms {
+  --rd-dms-orange: #ff5722;
+  --rd-dms-orange-dark: #e64a19;
+  --rd-dms-bg: #f2f2f2;
+  --rd-dms-card: #ffffff;
+  --rd-dms-text: #303030;
+  --rd-dms-muted: #777777;
+  --rd-dms-border: #dedede;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  color: var(--rd-dms-text);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.rd-kit-dms *,
+.rd-kit-dms *::before,
+.rd-kit-dms *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.rd-kit-dms .rd-kit-dms-title {
+  min-width: 0;
+}
+
+.rd-kit-dms .rd-kit-dms-breadcrumb {
+  color: var(--rd-dms-orange);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.rd-kit-dms .rd-kit-dms-title h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: #292929;
+}
+
+.rd-kit-dms .rd-kit-dms-title p {
+  margin: 5px 0 0;
+  color: var(--rd-dms-muted);
+  font-size: 12px;
+}
+
+/* ==========================================
+   HEADER COUNTS
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+  min-width: 0;
+}
+
+.rd-kit-dms .rd-kit-dms-counts {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.rd-kit-dms .rd-kit-dms-counts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 13px;
+  border-left: 1px solid var(--rd-dms-border);
+}
+
+.rd-kit-dms .rd-kit-dms-counts span {
+  color: #888;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rd-kit-dms .rd-kit-dms-counts strong {
+  color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   SYNC / REFRESH BUTTON
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-refresh {
+  min-height: 36px;
+  padding: 8px 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: none;
+  border-radius: 3px;
+
+  background: var(--rd-dms-orange);
+  color: white;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rd-kit-dms .rd-kit-dms-refresh:hover:not(:disabled) {
+  background: var(--rd-dms-orange-dark);
+}
+
+.rd-kit-dms .rd-kit-dms-refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   STATUS MESSAGES
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-status {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 10px;
+  padding: 9px 12px;
+
+  border: 1px solid;
+  border-radius: 3px;
+
+  font-size: 11px;
+}
+
+.rd-kit-dms .rd-kit-dms-status.success {
+  color: #2e7d32;
+  background: #e8f5e9;
+  border-color: #c8e6c9;
+}
+
+.rd-kit-dms .rd-kit-dms-status.error {
+  color: #c62828;
+  background: #ffebee;
+  border-color: #ffcdd2;
+}
+
+.rd-kit-dms .rd-kit-dms-status button {
+  padding: 0 3px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   MAIN CARD
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-card {
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: var(--rd-dms-card);
+  border: 1px solid var(--rd-dms-border);
+  border-radius: 4px;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+/* ==========================================
+   CARD HEADER
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-card-heading {
+  min-height: 62px;
+  padding: 12px 15px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  flex-shrink: 0;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+.rd-kit-dms .rd-kit-dms-card-heading h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rd-kit-dms .rd-kit-dms-card-heading h3 svg {
+  color: var(--rd-dms-orange);
+  font-size: 17px;
+}
+
+.rd-kit-dms .rd-kit-dms-card-heading p {
+  margin: 5px 0 0;
+  color: #888;
+  font-size: 11px;
+}
+
+.rd-kit-dms .rd-kit-dms-record-count {
+  padding: 6px 9px;
+
+  border-radius: 3px;
+
+  background: #fff0e9;
+  color: var(--rd-dms-orange-dark);
+
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   SEARCH TOOLBAR
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-toolbar {
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  padding: 9px 12px;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+.rd-kit-dms .rd-kit-dms-search {
+  width: min(470px, 100%);
+  min-width: 0;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 0 9px;
+
+  background: #f7f7f7;
+  border: 1px solid #dedede;
+  border-radius: 3px;
+}
+
+.rd-kit-dms .rd-kit-dms-search > svg {
+  flex-shrink: 0;
+  color: #888;
+  font-size: 14px;
+}
+
+.rd-kit-dms .rd-kit-dms-search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+
+  padding: 0;
+
+  color: #444;
+  background: transparent;
+
+  border: none;
+  outline: none;
+
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.rd-kit-dms .rd-kit-dms-search input::placeholder {
+  color: #999;
+}
+
+.rd-kit-dms .rd-kit-dms-search button[type="submit"] {
+  flex-shrink: 0;
+
+  height: 25px;
+  padding: 0 10px;
+
+  color: #fff;
+  background: var(--rd-dms-orange);
+
+  border: none;
+  border-radius: 2px;
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.rd-kit-dms .rd-kit-dms-search button[type="submit"]:hover {
+  background: var(--rd-dms-orange-dark);
+}
+
+.rd-kit-dms .rd-kit-dms-clear {
+  flex-shrink: 0;
+
+  padding: 0 3px;
+
+  color: #888;
+  background: transparent;
+  border: none;
+
+  font-size: 17px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   TABLE SCROLL
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-table-scroll {
+  width: 100%;
+  max-width: 100%;
+
+  flex: 1;
+  min-height: 0;
+
+  overflow: auto;
+  max-height: none;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-table {
+  width: 100%;
+  min-width: 1050px;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.rd-kit-dms .rd-kit-dms-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  padding: 11px 12px;
+
+  background: #eeeeee;
+  color: #444;
+
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+
+  border-bottom: 1px solid #d5d5d5;
+}
+
+.rd-kit-dms .rd-kit-dms-table td {
+  padding: 10px 12px;
+
+  color: #555;
+
+  border-bottom: 1px solid #eeeeee;
+
+  font-size: 11px;
+}
+
+.rd-kit-dms .rd-kit-dms-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.rd-kit-dms .rd-kit-dms-table tbody tr:hover {
+  background: #fff3ed;
+}
+
+.rd-kit-dms .rd-kit-dms-table td:first-child {
+  color: #999;
+  font-size: 10px;
+}
+
+.rd-kit-dms .rd-kit-dms-table td.rd-kit-dms-chassis {
+  color: #303030;
+  font-weight: 700;
+}
+
+.rd-kit-dms .rd-kit-dms-table td.rd-kit-dms-empty {
+  padding: 35px 15px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-message {
+  min-height: 200px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: #777;
+  font-size: 12px;
+}
+
+.rd-kit-dms .rd-kit-dms-message svg {
+  color: var(--rd-dms-orange);
+}
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-error {
+  min-height: 150px;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  color: #c62828;
+  font-size: 12px;
+  text-align: center;
+}
+
+.rd-kit-dms .rd-kit-dms-error button {
+  padding: 7px 15px;
+
+  border: none;
+  border-radius: 3px;
+
+  background: var(--rd-dms-orange);
+  color: white;
+
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-pagination {
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 2px 0;
+  margin-top: 3px;
+}
+
+.rd-kit-dms .rd-kit-dms-pagination > span {
+  color: #777;
+  font-size: 11px;
+}
+
+.rd-kit-dms .rd-kit-dms-pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rd-kit-dms .rd-kit-dms-pagination-buttons button {
+  min-height: 34px;
+  padding: 7px 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  border: 1px solid var(--rd-dms-border);
+  border-radius: 3px;
+
+  background: white;
+  color: #555;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.rd-kit-dms .rd-kit-dms-pagination-buttons button:hover:not(:disabled) {
+  border-color: var(--rd-dms-orange);
+  color: var(--rd-dms-orange);
+}
+
+.rd-kit-dms .rd-kit-dms-pagination-buttons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   SPINNER
+========================================== */
+
+.rd-kit-dms .rd-kit-dms-spin {
+  animation: rd-dms-spin 0.7s linear infinite;
+}
+
+@keyframes rd-dms-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+  .rd-kit-dms {
+    padding: 13px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-header {
+    align-items: flex-start;
+  }
+
+  .rd-kit-dms .rd-kit-dms-header-right {
+    flex-wrap: wrap;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts {
+    gap: 10px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .rd-kit-dms {
+    padding: 10px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-header {
+    flex-shrink: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-header-right {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts > div {
+    padding-left: 8px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts strong {
+    font-size: 14px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-title h2 {
+    font-size: 19px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-toolbar {
+    justify-content: stretch;
+  }
+
+  .rd-kit-dms .rd-kit-dms-search {
+    width: 100%;
+  }
+
+  .rd-kit-dms .rd-kit-dms-table-scroll {
+    max-height: none;
+  }
+
+  .rd-kit-dms .rd-kit-dms-pagination {
+    flex-shrink: 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-kit-dms .rd-kit-dms-pagination-buttons {
+    width: 100%;
+  }
+
+  .rd-kit-dms .rd-kit-dms-pagination-buttons button {
+    flex: 1;
+    min-height: 40px;
+  }
+}
+
+/* ==========================================
+   SMALL ANDROID PHONES
+========================================== */
+
+@media (max-width: 420px) {
+  .rd-kit-dms {
+    padding: 8px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-title h2 {
+    font-size: 17px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-title p {
+    font-size: 11px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-header-right {
+    gap: 8px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts {
+    gap: 6px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts > div {
+    padding-left: 6px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts span {
+    font-size: 9px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts strong {
+    font-size: 12px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-refresh {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-card-heading {
+    padding: 11px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-card-heading h3 {
+    font-size: 13px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-card-heading p {
+    font-size: 10px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-record-count {
+    font-size: 9px;
+    padding: 5px 6px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-pagination > span {
+    font-size: 10px;
+  }
+}
+
+/* ==========================================
+   VERY SMALL SCREENS
+========================================== */
+
+@media (max-width: 360px) {
+  .rd-kit-dms {
+    padding: 6px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts {
+    gap: 4px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-counts strong {
+    font-size: 11px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-refresh {
+    padding: 6px 7px;
+  }
+
+  .rd-kit-dms .rd-kit-dms-card-heading {
+    align-items: flex-start;
+  }
+}
+
+
+.rd-kit-dms-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rd-kit-dms-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rd-kit-dms-search {
+  display: flex;
+  align-items: center;
+  width: 320px;
+  max-width: 100%;
+}
+
+/* Remove the old search toolbar spacing inside the records card */
+.rd-kit-dms .rd-kit-dms-toolbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .rd-kit-dms-header-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-kit-dms-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .rd-kit-dms-search {
+    width: 100%;
+  }
+}

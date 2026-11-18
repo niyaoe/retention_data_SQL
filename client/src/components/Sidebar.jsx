@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 import {
   FiDatabase,
@@ -15,13 +14,7 @@ import {
 
 import "./Sidebar.css";
 
-function Sidebar({
-  user,
-  collapsed,
-  mobileOpen,
-  onClose,
-  onToggle,
-}) {
+function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
   const menuItems = [
     {
       title: "Sales Data",
@@ -33,6 +26,12 @@ function Sidebar({
       title: "Service Data",
       path: "/service-data",
       icon: <FiTool />,
+      roles: ["admin", "user"],
+    },
+    {
+      title: "DMS Retail",
+      icon: <FiDatabase />,
+      path: "/dms-retail",
       roles: ["admin", "user"],
     },
     {
@@ -74,7 +73,7 @@ function Sidebar({
   ];
 
   const visibleItems = menuItems.filter((item) =>
-    item.roles.includes(user?.role)
+    item.roles.includes(user?.role),
   );
 
   const sidebarClasses = [
@@ -122,9 +121,7 @@ function Sidebar({
       {/* MENU */}
 
       <div className="rd-kit-sidebar-menu">
-        <div className="rd-kit-sidebar-label">
-          NAVIGATION
-        </div>
+        <div className="rd-kit-sidebar-label">NAVIGATION</div>
 
         <nav className="rd-kit-sidebar-nav">
           {visibleItems.map((item) => (
@@ -137,13 +134,9 @@ function Sidebar({
                 `rd-kit-sidebar-link ${isActive ? "active" : ""}`
               }
             >
-              <span className="rd-kit-sidebar-icon">
-                {item.icon}
-              </span>
+              <span className="rd-kit-sidebar-icon">{item.icon}</span>
 
-              <span className="rd-kit-sidebar-link-text">
-                {item.title}
-              </span>
+              <span className="rd-kit-sidebar-link-text">{item.title}</span>
             </NavLink>
           ))}
         </nav>
@@ -163,9 +156,7 @@ function Sidebar({
           </div>
         </div>
 
-        <div className="rd-kit-sidebar-version">
-          RETENTION DATA SYSTEM
-        </div>
+        <div className="rd-kit-sidebar-version">RETENTION DATA SYSTEM</div>
       </div>
     </aside>
   );
