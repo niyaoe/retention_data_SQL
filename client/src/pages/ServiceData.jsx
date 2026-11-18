@@ -149,6 +149,7 @@ function ServiceData() {
                   <th>RO Date</th>
                   <th>Registration Number</th>
                   <th>Chassis Number</th>
+                  <th>PIN Code</th>
                   <th>Service Category</th>
                   <th>Service Type</th>
                   <th>Service Advisor</th>
@@ -170,6 +171,7 @@ function ServiceData() {
                       <td>{formatDate(record.ro_date)}</td>
                       <td>{record.registration_number || "—"}</td>
                       <td>{record.chassis_number || "—"}</td>
+                      <td>{record.pincode || "-"}</td>
                       <td>{record.service_category || "—"}</td>
                       <td>{record.service_type || "—"}</td>
                       <td>{record.ro_service_advisor || "—"}</td>
