@@ -1,8 +1,10 @@
+
 import { NavLink } from "react-router-dom";
 import {
   FiDatabase,
   FiBarChart2,
   FiTool,
+  FiTruck,
   FiLayers,
   FiUsers,
   FiGitBranch,
@@ -35,8 +37,8 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
       roles: ["admin", "user"],
     },
     {
-      title: "Sales Master",
-      path: "/sales-master",
+      title: "Chassis Master",
+      path: "/chassis-master",
       icon: <FiLayers />,
       roles: ["admin", "user"],
     },
@@ -55,7 +57,7 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
     {
       title: "Model Management",
       path: "/model-management",
-      icon: <FiLayers />,
+      icon: <FiTruck />,
       roles: ["admin"],
     },
     {
@@ -73,7 +75,7 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
   ];
 
   const visibleItems = menuItems.filter((item) =>
-    item.roles.includes(user?.role),
+    item.roles.includes(user?.role)
   );
 
   const sidebarClasses = [
@@ -135,8 +137,9 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
               }
             >
               <span className="rd-kit-sidebar-icon">{item.icon}</span>
-
-              <span className="rd-kit-sidebar-link-text">{item.title}</span>
+              <span className="rd-kit-sidebar-link-text">
+                {item.title}
+              </span>
             </NavLink>
           ))}
         </nav>
@@ -156,7 +159,9 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
           </div>
         </div>
 
-        <div className="rd-kit-sidebar-version">RETENTION DATA SYSTEM</div>
+        <div className="rd-kit-sidebar-version">
+          RETENTION DATA SYSTEM
+        </div>
       </div>
     </aside>
   );

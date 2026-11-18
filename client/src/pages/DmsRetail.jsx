@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
@@ -54,8 +53,7 @@ function DmsRetail() {
       }));
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          "Unable to load DMS Retail records"
+        err.response?.data?.message || "Unable to load DMS Retail records",
       );
     } finally {
       setLoading(false);
@@ -100,9 +98,9 @@ function DmsRetail() {
       const result = response.data;
 
       setMessage(
-        `Sync completed. ${Number(
-          result.uniqueChassisRows || 0
-        ).toLocaleString("en-IN")} unique records processed.`
+        `Sync completed. ${Number(result.uniqueChassisRows || 0).toLocaleString(
+          "en-IN",
+        )} unique records processed.`,
       );
 
       setSearch("");
@@ -116,7 +114,7 @@ function DmsRetail() {
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          "DMS Retail sync failed"
+          "DMS Retail sync failed",
       );
     } finally {
       setSyncing(false);
@@ -124,10 +122,7 @@ function DmsRetail() {
   };
 
   const changePage = (nextPage) => {
-    if (
-      nextPage < 1 ||
-      nextPage > pagination.totalPages
-    ) {
+    if (nextPage < 1 || nextPage > pagination.totalPages) {
       return;
     }
 
@@ -137,12 +132,10 @@ function DmsRetail() {
     }));
   };
 
-  const formatNumber = (value) =>
-    Number(value || 0).toLocaleString("en-IN");
+  const formatNumber = (value) => Number(value || 0).toLocaleString("en-IN");
 
   return (
     <div className="rd-kit-dms">
-
       {/* HEADER */}
 
       <div className="rd-kit-dms-header">
@@ -157,7 +150,6 @@ function DmsRetail() {
         </div>
 
         <div className="rd-kit-dms-header-right">
-
           <div className="rd-kit-dms-counts">
             <div>
               <span>Total Records</span>
@@ -176,35 +168,30 @@ function DmsRetail() {
               <strong>{pagination.limit}</strong>
             </div>
           </div>
-          <form
-            className="rd-kit-dms-search"
-            onSubmit={handleSearch}
-          >
-            <FiSearch />
+          <div className="rd-kit-dms-toolbar">
+            <form className="rd-kit-dms-search" onSubmit={handleSearch}>
+              <FiSearch />
 
-            <input
-              type="text"
-              placeholder="Search chassis, phone, dealer, model, PIN, email..."
-              value={searchInput}
-              onChange={(event) =>
-                setSearchInput(event.target.value)
-              }
-            />
+              <input
+                type="text"
+                placeholder="Search chassis, phone, dealer, model, PIN, email..."
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
 
-            {searchInput && (
-              <button
-                type="button"
-                className="rd-kit-dms-clear"
-                onClick={clearSearch}
-              >
-                ×
-              </button>
-            )}
+              {searchInput && (
+                <button
+                  type="button"
+                  className="rd-kit-dms-clear"
+                  onClick={clearSearch}
+                >
+                  ×
+                </button>
+              )}
 
-            <button type="submit">
-              Search
-            </button>
-          </form>
+              <button type="submit">Search</button>
+            </form>
+          </div>
 
           {user?.role === "admin" && (
             <button
@@ -213,11 +200,7 @@ function DmsRetail() {
               onClick={handleSync}
               disabled={syncing}
             >
-              <FiRefreshCw
-                className={
-                  syncing ? "rd-kit-dms-spin" : ""
-                }
-              />
+              <FiRefreshCw className={syncing ? "rd-kit-dms-spin" : ""} />
               {syncing ? "Syncing..." : "Sync Feed"}
             </button>
           )}
@@ -229,13 +212,10 @@ function DmsRetail() {
               onClick={loadRecords}
               disabled={loading}
             >
-              <FiRefreshCw
-                className={loading ? "rd-kit-dms-spin" : ""}
-              />
+              <FiRefreshCw className={loading ? "rd-kit-dms-spin" : ""} />
               Refresh
             </button>
           )}
-
         </div>
       </div>
 
@@ -244,10 +224,7 @@ function DmsRetail() {
       {message && (
         <div className="rd-kit-dms-status success">
           <span>{message}</span>
-          <button
-            type="button"
-            onClick={() => setMessage("")}
-          >
+          <button type="button" onClick={() => setMessage("")}>
             ×
           </button>
         </div>
@@ -256,10 +233,7 @@ function DmsRetail() {
       {error && (
         <div className="rd-kit-dms-status error">
           <span>{error}</span>
-          <button
-            type="button"
-            onClick={() => setError("")}
-          >
+          <button type="button" onClick={() => setError("")}>
             ×
           </button>
         </div>
@@ -268,7 +242,6 @@ function DmsRetail() {
       {/* TABLE CARD */}
 
       <div className="rd-kit-dms-card">
-
         {/* CARD HEADING */}
 
         <div className="rd-kit-dms-card-heading">
@@ -278,9 +251,7 @@ function DmsRetail() {
               DMS Retail Records
             </h3>
 
-            <p>
-              Retail customer and vehicle records retrieved from MySQL
-            </p>
+            <p>Retail customer and vehicle records retrieved from MySQL</p>
           </div>
 
           <span className="rd-kit-dms-record-count">
@@ -305,10 +276,7 @@ function DmsRetail() {
           <div className="rd-kit-dms-error">
             {error}
 
-            <button
-              type="button"
-              onClick={loadRecords}
-            >
+            <button type="button" onClick={loadRecords}>
               Retry
             </button>
           </div>
@@ -340,9 +308,7 @@ function DmsRetail() {
 
                       <td>{record.phone_no || "—"}</td>
 
-                      <td>
-                        {record.lessee_mobile_number || "—"}
-                      </td>
+                      <td>{record.lessee_mobile_number || "—"}</td>
 
                       <td>{record.dealer_code || "—"}</td>
 
@@ -355,10 +321,7 @@ function DmsRetail() {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="8"
-                      className="rd-kit-dms-empty"
-                    >
+                    <td colSpan="8" className="rd-kit-dms-empty">
                       No records found
                     </td>
                   </tr>
@@ -367,7 +330,6 @@ function DmsRetail() {
             </table>
           </div>
         )}
-
       </div>
 
       {/* PAGINATION */}
@@ -382,9 +344,7 @@ function DmsRetail() {
           <button
             type="button"
             disabled={loading || pagination.page <= 1}
-            onClick={() =>
-              changePage(pagination.page - 1)
-            }
+            onClick={() => changePage(pagination.page - 1)}
           >
             <FiChevronLeft />
             Previous
@@ -392,20 +352,14 @@ function DmsRetail() {
 
           <button
             type="button"
-            disabled={
-              loading ||
-              pagination.page >= pagination.totalPages
-            }
-            onClick={() =>
-              changePage(pagination.page + 1)
-            }
+            disabled={loading || pagination.page >= pagination.totalPages}
+            onClick={() => changePage(pagination.page + 1)}
           >
             Next
             <FiChevronRight />
           </button>
         </div>
       </div>
-
     </div>
   );
 }

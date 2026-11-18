@@ -1,6 +1,7 @@
 
 const XLSX = require("xlsx");
 const { pool } = require("../config/db");
+const { syncChassisMaster } = require("../services/chassisMasterSyncService");
 
 const SHEET_NAME = "Sales Data";
 const BATCH_SIZE = 500;
@@ -339,10 +340,36 @@ const importSalesExcel = async (req, res) => {
       }
     }
 
+    // Update Chassis Master after all Sales Excel batches are committed
+    let chassisMasterSync = null;
+
+    try {
+      console.log("[SALES EXCEL] Updating Chassis Master...");
+
+      chassisMasterSync = await syncChassisMaster();
+
+      console.log("[SALES EXCEL] Chassis Master sync completed.");
+    } catch (syncError) {
+      console.error(
+        "[SALES EXCEL] Chassis Master sync failed:",
+        syncError.message
+      );
+
+      chassisMasterSync = {
+        success: false,
+        message: syncError.message
+      };
+    }
+
     return res.json({
       success: true,
       message: "Sales Excel import completed successfully.",
-      report
+      report: {
+        ...report,
+        importMode: "UPSERT",
+        existingRecordsDeleted: false,
+        chassisMasterSync
+      }
     });
   } catch (error) {
     console.error("Sales Excel import error:", error);

@@ -8,28 +8,41 @@
 
 .rd-kit-service-import {
   --rdsi-orange: #ff5722;
-  --rdsi-orange-dark: #e64a19;
-  --rdsi-bg: #f2f2f2;
-  --rdsi-card: #ffffff;
-  --rdsi-text: #303030;
-  --rdsi-muted: #777777;
-  --rdsi-border: #dedede;
-  --rdsi-green: #43a047;
-  --rdsi-red: #e53935;
 
   width: 100%;
   min-width: 0;
+
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+
   padding: 16px;
+  box-sizing: border-box;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
   color: var(--rdsi-text);
   font-family: Roboto, Arial, sans-serif;
   font-size: 13px;
-  box-sizing: border-box;
 }
-
 .rd-kit-service-import *,
 .rd-kit-service-import *::before,
 .rd-kit-service-import *::after {
   box-sizing: border-box;
+}
+
+.rd-kit-service-import,
+.rd-kit-service-import * {
+  box-sizing: border-box;
+}
+
+.rd-kit-service-import-table-scroll {
+  width: 100%;
+  max-height: 360px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* HEADER */

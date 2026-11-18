@@ -1,5 +1,6 @@
 
 const { pool } = require("../config/db");
+const { syncChassisMaster } = require("../services/chassisMasterSyncService");
 
 const SOURCE_TABLE =
     "eramsale_service_report.service_bill_status";
@@ -315,8 +316,39 @@ async function runServiceApiSync() {
         await connection.commit();
         transactionStarted = false;
 
+        // ========================================
+        // 5. SYNC CHASSIS MASTER
+        // ========================================
+
+        let chassisMasterSync = null;
+
+        try {
+            console.log("[SERVICE MYSQL SYNC] Updating Chassis Master...");
+
+            chassisMasterSync = await syncChassisMaster();
+
+            console.log(
+                "[SERVICE MYSQL SYNC] Chassis Master sync completed."
+            );
+
+        } catch (syncError) {
+            console.error(
+                "[SERVICE MYSQL SYNC] Chassis Master sync failed:",
+                syncError.message
+            );
+
+            chassisMasterSync = {
+                success: false,
+                message: syncError.message,
+            };
+        }
+
+        // ========================================
+        // 6. FINAL REPORT
+        // ========================================
+
         console.log(
-            `[SERVICE MYSQL SYNC] Completed. Unique ROs: ${submittedRows}`
+            `[SERVICE MYSQL SYNC] Success: ${submittedRows} rows processed.`
         );
 
         return {
@@ -327,7 +359,9 @@ async function runServiceApiSync() {
             importMode: "MYSQL UPSERT",
             existingRecordsDeleted: false,
             pincodeHandling: "Existing PIN codes preserved",
+            chassisMasterSync,
         };
+
 
     } catch (error) {
         if (connection && transactionStarted) {

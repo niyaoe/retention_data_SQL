@@ -1,5 +1,6 @@
 
 const { pool } = require("../config/db");
+const { syncChassisMaster } = require("../services/chassisMasterSyncService");
 
 const API_URL =
   process.env.SALES_DELIVERY_API_URL ||
@@ -160,7 +161,7 @@ async function runSalesSync() {
 
     lockAcquired = true;
 
-    
+
     // 1. Fetch API CSV with timeout and automatic retries.
     const csvText = await fetchSalesCsv();
 
@@ -318,6 +319,33 @@ async function runSalesSync() {
 
     await connection.commit();
     transactionStarted = false;
+
+    // ========================================
+    // 5. SYNC CHASSIS MASTER
+    // ========================================
+
+    try {
+      console.log("[SALES SYNC] Updating Chassis Master...");
+
+      const chassisSyncResult = await syncChassisMaster();
+
+      report.chassisMasterSync = chassisSyncResult;
+
+      console.log("[SALES SYNC] Chassis Master updated successfully.");
+
+    } catch (syncError) {
+      console.error(
+        "[SALES SYNC] Chassis Master sync failed:",
+        syncError.message
+      );
+
+      // Sales sync has already committed successfully.
+      // Do not report the Sales import itself as failed.
+      report.chassisMasterSync = {
+        success: false,
+        message: syncError.message,
+      };
+    }
 
     console.log(
       `[SALES SYNC] Success: ${report.upsertedRows} rows processed.`

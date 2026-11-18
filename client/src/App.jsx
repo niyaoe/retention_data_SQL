@@ -8,7 +8,7 @@ import DashboardLayout from "./components/DashboardLayout";
 
 import SalesData from "./pages/SalesData";
 import ServiceData from "./pages/ServiceData";
-import SalesMaster from "./pages/SalesMaster";
+import ChassisMaster from "./pages/ChassisMaster";
 import UserManagement from "./pages/UserManagement";
 import BranchManagement from "./pages/BranchManagement";
 import SalesExcelImport from "./pages/SalesExcelImport";
@@ -58,9 +58,9 @@ function App() {
 
           <Route path="/service-data" element={<ServiceData />} />
 
-          <Route path="/sales-master" element={<SalesMaster />} />
+          <Route path="/chassis-master" element={<ChassisMaster />} />
 
-          <Route path="dms-retail" element={<DmsRetail />} />
+          <Route path="/dms-retail" element={<DmsRetail />} />
 
           <Route
             path="/sales-import"

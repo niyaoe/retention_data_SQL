@@ -1,6 +1,7 @@
 
 const XLSX = require("xlsx");
 const { pool } = require("../config/db");
+const { syncChassisMaster } = require("../services/chassisMasterSyncService");
 
 const REQUIRED_HEADERS = [
     "invoice_date",
@@ -339,8 +340,40 @@ exports.upsertServiceData = async (req, res) => {
             submittedRows += batch.length;
         }
 
+
         await connection.commit();
         transactionStarted = false;
+
+        // ========================================
+        // SYNC CHASSIS MASTER
+        // ========================================
+
+        let chassisMasterSync = null;
+
+        try {
+            console.log("[SERVICE EXCEL] Updating Chassis Master...");
+
+            chassisMasterSync = await syncChassisMaster();
+
+            console.log(
+                "[SERVICE EXCEL] Chassis Master sync completed."
+            );
+
+        } catch (syncError) {
+            console.error(
+                "[SERVICE EXCEL] Chassis Master sync failed:",
+                syncError.message
+            );
+
+            chassisMasterSync = {
+                success: false,
+                message: syncError.message,
+            };
+        }
+
+        // ========================================
+        // SUCCESS RESPONSE
+        // ========================================
 
         return res.status(200).json({
             success: true,
@@ -352,8 +385,10 @@ exports.upsertServiceData = async (req, res) => {
                 roDate: "NULL for imported records",
                 importMode: "UPSERT",
                 existingRecordsDeleted: false,
+                chassisMasterSync,
             },
         });
+
     } catch (error) {
         if (connection && transactionStarted) {
             await connection.rollback();

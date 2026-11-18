@@ -10,13 +10,13 @@ const sqlRoutes = require("./routes/sqlRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
 const mongoRoutes = require("./routes/mongoRoutes");
 const importRoutes = require("./routes/importRoutes");
-const { startAutoSync } = require("./services/syncService");
+// const { startAutoSync } = require("./services/syncService");
 const authRoutes = require("./routes/authRoutes");
 const branchRoutes = require("./routes/branchRoutes");
 const userRoutes = require("./routes/userRoutes");
 const salesDataRoutes = require("./routes/salesDataRoutes");
 const serviceDataRoutes = require("./routes/serviceDataRoutes");
-const salesMasterRoutes = require("./routes/salesMasterRoutes");
+const chassisMasterRoutes = require("./routes/chassisMasterRoutes");
 const salesExcelRoutes = require("./routes/salesExcelRoutes");
 const modelRoutes = require("./routes/modelRoutes");
 const modelImportRoutes = require("./routes/modelImportRoutes");
@@ -35,7 +35,7 @@ const {
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: process.env.CLIENT_URL
 }));
 
 app.use(express.json());
@@ -48,13 +48,13 @@ app.get("/", (req, res) => {
 app.use("/api/sql", sqlRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.use("/api/mongo", mongoRoutes);
-app.use("/api/import", importRoutes);
+// app.use("/api/import", importRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/branches", branchRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/sales-data", salesDataRoutes);
 app.use("/api/service-data", serviceDataRoutes);
-app.use("/api/sales-master", salesMasterRoutes);
+app.use("/api/chassis-master", chassisMasterRoutes);
 app.use("/api/sales-excel", salesExcelRoutes);
 app.use("/api/models", modelRoutes);
 app.use("/api/model-import", modelImportRoutes);
