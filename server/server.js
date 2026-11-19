@@ -4,12 +4,12 @@ const cors = require("cors");
 require("dotenv").config();
 
 const { testMySQLConnection } = require("./config/db");
-const connectMongo = require("./config/mongo");
+// const connectMongo = require("./config/mongo");
 
 const sqlRoutes = require("./routes/sqlRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
-const mongoRoutes = require("./routes/mongoRoutes");
-const importRoutes = require("./routes/importRoutes");
+// const mongoRoutes = require("./routes/mongoRoutes");
+// const importRoutes = require("./routes/importRoutes");
 // const { startAutoSync } = require("./services/syncService");
 const authRoutes = require("./routes/authRoutes");
 const branchRoutes = require("./routes/branchRoutes");
@@ -47,8 +47,8 @@ app.get("/", (req, res) => {
 });
 app.use("/api/sql", sqlRoutes);
 app.use("/api/analysis", analysisRoutes);
-app.use("/api/mongo", mongoRoutes);
-// app.use("/api/import", importRoutes);
+// app.use("/api/mongo", mongoRoutes);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/branches", branchRoutes);
 app.use("/api/users", userRoutes);
@@ -68,7 +68,7 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    await connectMongo();
+    // await connectMongo();
     await testMySQLConnection();
 
     app.listen(PORT, () => {

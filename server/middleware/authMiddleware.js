@@ -2,7 +2,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Verify login token and load the current user
+// Verify login token and load current user
 const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -10,32 +10,36 @@ const protect = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
-        message: "Authentication required. Please log in."
+        message: "Authentication required. Please log in.",
       });
     }
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
 
-    const user = await User.findById(decoded.id)
-      .select("_id name email role branchId status")
-      .populate("branchId", "branchName locationCode branchShort");
+    const user = await User.findById(decoded.id);
 
     if (!user || user.status !== "active") {
       return res.status(401).json({
         success: false,
-        message: "User account not found or inactive."
+        message: "User account not found or inactive.",
       });
     }
 
     req.user = user;
 
     next();
+
   } catch (error) {
+    console.error("Authentication error:", error.message);
+
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired authentication token."
+      message: "Invalid or expired authentication token.",
     });
   }
 };
@@ -46,7 +50,7 @@ const authorize = (...roles) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: "You do not have permission to access this resource."
+        message: "You do not have permission to access this resource.",
       });
     }
 
@@ -56,5 +60,5 @@ const authorize = (...roles) => {
 
 module.exports = {
   protect,
-  authorize
+  authorize,
 };

@@ -177,11 +177,14 @@ async function runSalesSync() {
 
     // 2. Load SQL master mappings.
     const [branches] = await connection.query(`
-      SELECT d_code, branch_name
-      FROM branch_master
-      WHERE d_code IS NOT NULL
-        AND branch_name IS NOT NULL
-    `);
+  SELECT
+    d_code,
+    dms_name,
+    branch_name
+  FROM branch_master
+  WHERE branch_name IS NOT NULL
+    AND TRIM(branch_name) <> ''
+`);
 
     const [models] = await connection.query(`
       SELECT model_group, sub_segment
@@ -189,12 +192,24 @@ async function runSalesSync() {
       WHERE is_active = 1
     `);
 
-    const branchMap = new Map(
-      branches.map((item) => [
-        normalize(item.d_code),
-        item.branch_name.trim(),
-      ])
-    );
+    // Branch mapping: D-Code, DMS Name and standard Branch Name
+    const branchCodeMap = new Map();
+    const branchDmsMap = new Map();
+    const branchNameMap = new Map();
+
+    for (const item of branches) {
+      const branchName = item.branch_name.trim();
+
+      if (item.d_code) {
+        branchCodeMap.set(normalize(item.d_code), branchName);
+      }
+
+      if (item.dms_name) {
+        branchDmsMap.set(normalize(item.dms_name), branchName);
+      }
+
+      branchNameMap.set(normalize(branchName), branchName);
+    }
 
     const modelMap = new Map(
       models.map((item) => [
@@ -217,6 +232,9 @@ async function runSalesSync() {
       invalidDates: 0,
       batchesCompleted: 0,
       upsertedRows: 0,
+      branchMatchedByDCode: 0,
+      branchMatchedByDmsName: 0,
+      branchMatchedByBranchName: 0,
     };
 
     const mappedRecords = [];
@@ -233,13 +251,57 @@ async function runSalesSync() {
       const branchCode = normalize(record.Dealer_Location_Code);
       const modelKey = normalize(record.Model_Group);
 
-      const branchName = branchMap.get(branchCode);
+      // Priority 1: Dealer Location Code
+      let branchName = branchCodeMap.get(branchCode);
+
+      if (branchName) {
+        report.branchMatchedByDCode++;
+      } else {
+        // Priority 2: DMS alternate branch name
+        branchName = branchDmsMap.get(branchCode);
+
+        if (branchName) {
+          report.branchMatchedByDmsName++;
+        } else {
+          // Priority 3: Standard branch name
+          branchName = branchNameMap.get(branchCode);
+
+          if (branchName) {
+            report.branchMatchedByBranchName++;
+          }
+        }
+      }
+
       const model = modelMap.get(modelKey);
 
       if (!branchName) {
         const key = branchCode || "(blank)";
         report.unmatchedBranches[key] =
           (report.unmatchedBranches[key] || 0) + 1;
+      }
+
+      // Standardize branch names before saving to Sales Data
+      if (branchName) {
+        const standardBranchNames = {
+          CALICUT: "Calicut",
+          THRISSUR: "Thrissur",
+          KANNUR: "Kannur",
+          MALAPPURAM: "Malappuram",
+          KASARAGOD: "Kasaragod",
+          KASARGOD: "Kasaragod",
+          "PALAKKAD-SR": "Palakkad",
+          "PALAKKAD - SR": "Palakkad",
+          PALAKKAD: "Palakkad",
+          PATTAMBI: "Pattambi",
+          WAYANAD: "Wayanad",
+          MUNDUR: "Mundur",
+          CHITTUR: "Chittur",
+        };
+
+        const normalizedBranch = normalize(branchName);
+
+        branchName =
+          standardBranchNames[normalizedBranch] || branchName;
       }
 
       if (!model) {

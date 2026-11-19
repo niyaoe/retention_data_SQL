@@ -4,7 +4,10 @@ const multer = require("multer");
 
 const {
   getBranches,
-  importBranches
+  importBranches,
+  createBranch,
+  updateBranch,
+  updateBranchStatus,
 } = require("../controllers/branchController");
 
 // These middleware exports will be created
@@ -38,10 +41,19 @@ const upload = multer({
   }
 });
 
-// Admin and authenticated users can view branches
 router.get("/", protect, getBranches);
 
-// Only admin can import branches
+router.post("/", protect, authorize("admin"), createBranch);
+
+router.put("/:id", protect, authorize("admin"), updateBranch);
+
+router.patch(
+  "/:id/status",
+  protect,
+  authorize("admin"),
+  updateBranchStatus
+);
+
 router.post(
   "/import",
   protect,
