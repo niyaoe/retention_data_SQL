@@ -28,11 +28,18 @@ function ChassisMaster() {
   const [error, setError] = useState("");
   const [selectedChassis, setSelectedChassis] = useState(null);
 
+  const [selectedSaleBranch, setSelectedSaleBranch] = useState("");
+  const [branches, setBranches] = useState([]);
+
   // ========================================
   // FETCH CHASSIS MASTER
   // ========================================
 
-  const fetchChassisMaster = async (page = 1, searchValue = search) => {
+  const fetchChassisMaster = async (
+    page = 1,
+    searchValue = search,
+    branchValue = selectedSaleBranch,
+  ) => {
     try {
       setLoading(true);
       setError("");
@@ -40,10 +47,11 @@ function ChassisMaster() {
       const response = await api.get(
         `/chassis-master?page=${page}&limit=25&search=${encodeURIComponent(
           searchValue.trim(),
-        )}`,
+        )}&saleBranch=${encodeURIComponent(branchValue)}`,
       );
 
       setRecords(response.data.records || []);
+      setBranches(response.data.branches || []);
 
       setPagination(
         response.data.pagination || {
@@ -205,7 +213,28 @@ function ChassisMaster() {
                 <tr>
                   <th>Chassis Number</th>
                   <th>Delivery Date</th>
-                  <th>Sale Branch</th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Sale Branch</span>
+
+                      <select
+                        value={selectedSaleBranch}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedSaleBranch(value);
+                          fetchChassisMaster(1, search, value);
+                        }}
+                      >
+                        <option value="">All Branches</option>
+
+                        {branches.map((branch) => (
+                          <option key={branch} value={branch}>
+                            {branch}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </th>
                   <th>Model</th>
                   <th>Customer Name</th>
                   <th>PIN Code</th>

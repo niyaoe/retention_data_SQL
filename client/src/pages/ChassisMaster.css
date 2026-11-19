@@ -676,3 +676,41 @@
   font-size: 11px;
   color: #777;
 }
+
+
+
+
+
+
+
+
+/* branch filter dropdown */
+
+.rd-kit-sales-master-th-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.rd-kit-sales-master-th-filter span {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rd-kit-sales-master-th-filter select {
+  width: 100%;
+  min-width: 120px;
+  height: 30px;
+  padding: 3px 6px;
+  font-size: 11px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  outline: none;
+}
+
+.rd-kit-sales-master-th-filter select:focus {
+  border-color: #ff5722;
+}

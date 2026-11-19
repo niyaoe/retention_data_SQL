@@ -19,42 +19,48 @@ const getChassisMaster = async (req, res) => {
 
         const search = String(req.query.search || "").trim();
         const offset = (page - 1) * limit;
+        const saleBranch = String(req.query.saleBranch || "").trim();
 
-        let whereClause = "";
+        const conditions = [];
         const searchParams = [];
 
-
         if (search) {
-            whereClause = `
-                WHERE
-                    cm.chassis_no LIKE ?
-                    OR s.cust_name LIKE ?
-                    OR s.mobile_no LIKE ?
-                    OR s.sale_branch LIKE ?
-                    OR s.model_group LIKE ?
-                    OR EXISTS (
-                        SELECT 1
-                        FROM ro_master_combined sr
-                        WHERE sr.chassis_number = cm.chassis_no
-                          AND (
-                              sr.registration_number LIKE ?
-                              OR sr.repair_order_number LIKE ?
-                          )
-                    )
-            `;
+            conditions.push(`
+        (
+            cm.chassis_no LIKE ?
+            OR s.cust_name LIKE ?
+            OR s.mobile_no LIKE ?
+            OR s.sale_branch LIKE ?
+            OR s.model_group LIKE ?
+            OR EXISTS (
+                SELECT 1
+                FROM ro_master_combined sr
+                WHERE sr.chassis_number = cm.chassis_no
+                AND (
+                    sr.registration_number LIKE ?
+                    OR sr.repair_order_number LIKE ?
+                )
+            )
+        )
+    `);
 
             const term = `%${search}%`;
 
             searchParams.push(
-                term,
-                term,
-                term,
-                term,
-                term,
-                term,
-                term
+                term, term, term, term, term, term, term
             );
         }
+
+        if (saleBranch) {
+            conditions.push("s.sale_branch = ?");
+            searchParams.push(saleBranch);
+        }
+
+        const whereClause = conditions.length
+            ? `WHERE ${conditions.join(" AND ")}`
+            : "";
+
+
 
         const countStartedAt = Date.now();
 
@@ -250,9 +256,20 @@ last_any_service.dealer_location AS last_service_location_any,
             `[Chassis Master] Total controller time: ${Date.now() - countStartedAt} ms`
         );
 
+        const [branchRows] = await pool.query(`
+    SELECT DISTINCT branch_name
+    FROM branch_master
+    WHERE branch_name IS NOT NULL
+      AND TRIM(branch_name) <> ''
+    ORDER BY branch_name
+`);
+
+        const branches = branchRows.map(row => row.branch_name);
+
         return res.status(200).json({
             success: true,
             records: formattedRecords,
+            branches,
             pagination: {
                 total,
                 page,
