@@ -659,3 +659,20 @@
     order: 2;
   }
 }
+
+.rd-kit-sales-master-place {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 130px;
+}
+
+.rd-kit-sales-master-place strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rd-kit-sales-master-place small {
+  font-size: 11px;
+  color: #777;
+}

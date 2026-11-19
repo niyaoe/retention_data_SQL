@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   FiX,
@@ -32,14 +31,13 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
         setError("");
 
         const response = await api.get(
-          `/chassis-master/${encodeURIComponent(chassisNumber)}`
+          `/chassis-master/${encodeURIComponent(chassisNumber)}`,
         );
 
         setRecord(response.data.record);
       } catch (err) {
         setError(
-          err.response?.data?.message ||
-            "Unable to load chassis details"
+          err.response?.data?.message || "Unable to load chassis details",
         );
       } finally {
         setLoading(false);
@@ -82,35 +80,22 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
 
   const InfoTile = ({ icon, label, value }) => (
     <div className="rd-k44-info-tile">
-      <div className="rd-k44-tile-icon">
-        {icon}
-      </div>
+      <div className="rd-k44-tile-icon">{icon}</div>
 
       <div className="rd-k44-tile-content">
         <span>{label}</span>
-        <strong title={value || ""}>
-          {value || "—"}
-        </strong>
+        <strong title={value || ""}>{value || "—"}</strong>
       </div>
     </div>
   );
 
   return (
-    <div
-      className="rd-k44-overlay"
-      onClick={onClose}
-    >
-      <div
-        className="rd-k44-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-
+    <div className="rd-k44-overlay" onClick={onClose}>
+      <div className="rd-k44-modal" onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
 
         <div className="rd-k44-header">
-
           <div className="rd-k44-header-left">
-
             <div className="rd-k44-header-icon">
               <FiTruck />
             </div>
@@ -119,7 +104,6 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
               <h2>Chassis Details</h2>
               <p>{chassisNumber}</p>
             </div>
-
           </div>
 
           <button
@@ -130,39 +114,28 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
           >
             <FiX />
           </button>
-
         </div>
 
         {/* CONTENT */}
 
         <div className="rd-k44-content">
-
           {loading ? (
-
             <div className="rd-k44-state">
               <FiRefreshCw className="rd-k44-spin" />
               <span>Loading chassis information...</span>
             </div>
-
           ) : error ? (
-
             <div className="rd-k44-error">
               <FiFileText />
               <span>{error}</span>
             </div>
-
           ) : record ? (
-
             <>
-
               {/* SALES INFORMATION */}
 
               {sales ? (
-
                 <section className="rd-k44-section">
-
                   <div className="rd-k44-section-heading">
-
                     <div>
                       <h3>
                         <FiTruck />
@@ -175,11 +148,9 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
                     <span className="rd-k44-section-tag">
                       SALES DATA AVAILABLE
                     </span>
-
                   </div>
 
                   <div className="rd-k44-sales-grid">
-
                     <InfoTile
                       icon={<FiHash />}
                       label="Chassis Number"
@@ -232,19 +203,24 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
                     />
 
                     <InfoTile
+                      icon={<FiMapPin />}
+                      label="Place / District"
+                      value={
+                        [record.place, record.district]
+                          .filter(Boolean)
+                          .join(" / ") || "—"
+                      }
+                    />
+
+                    <InfoTile
                       icon={<FiGrid />}
                       label="Segment"
                       value={sales.segment}
                     />
-
                   </div>
-
                 </section>
-
               ) : (
-
                 <section className="rd-k44-section">
-
                   <div className="rd-k44-section-heading">
                     <div>
                       <h3>
@@ -255,26 +231,20 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
                       <p>No matching Sales Data record found</p>
                     </div>
 
-                    <span className="rd-k44-section-tag">
-                      SERVICE ONLY
-                    </span>
+                    <span className="rd-k44-section-tag">SERVICE ONLY</span>
                   </div>
 
                   <div className="rd-k44-empty">
-                    This chassis exists in Service Data but does not have
-                    a matching Sales Data record.
+                    This chassis exists in Service Data but does not have a
+                    matching Sales Data record.
                   </div>
-
                 </section>
-
               )}
 
               {/* SERVICE HISTORY */}
 
               <section className="rd-k44-section rd-k44-service-section">
-
                 <div className="rd-k44-section-heading">
-
                   <div>
                     <h3>
                       <FiFileText />
@@ -287,15 +257,11 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
                   <span className="rd-k44-service-count">
                     {record.serviceCount ?? services.length} RECORDS
                   </span>
-
                 </div>
 
                 {services.length > 0 ? (
-
                   <div className="rd-k44-table-wrapper">
-
                     <table className="rd-k44-service-table">
-
                       <thead>
                         <tr>
                           <th>#</th>
@@ -312,36 +278,21 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
                       </thead>
 
                       <tbody>
-
                         {services.map((service, index) => (
-
-                          <tr
-                            key={service.sourceServiceId || index}
-                          >
-
-                            <td className="rd-k44-row-number">
-                              {index + 1}
-                            </td>
+                          <tr key={service.sourceServiceId || index}>
+                            <td className="rd-k44-row-number">{index + 1}</td>
 
                             <td className="rd-k44-ro-number">
                               {service.repairOrderNumber || "—"}
                             </td>
 
-                            <td>
-                              {formatDate(service.roDate)}
-                            </td>
+                            <td>{formatDate(service.roDate)}</td>
 
-                            <td>
-                              {formatDate(service.billDate)}
-                            </td>
+                            <td>{formatDate(service.billDate)}</td>
 
-                            <td>
-                              {service.registrationNumber || "—"}
-                            </td>
+                            <td>{service.registrationNumber || "—"}</td>
 
-                            <td>
-                              {service.dealerLocation || "—"}
-                            </td>
+                            <td>{service.dealerLocation || "—"}</td>
 
                             <td>
                               <span className="rd-k44-category">
@@ -349,63 +300,39 @@ function ChassisDetailsModal({ chassisNumber, onClose }) {
                               </span>
                             </td>
 
-                            <td>
-                              {service.serviceType || "—"}
-                            </td>
+                            <td>{service.serviceType || "—"}</td>
 
-                            <td>
-                              {service.roServiceAdvisor || "—"}
-                            </td>
+                            <td>{service.roServiceAdvisor || "—"}</td>
 
-                            <td>
-                              {service.productName || "—"}
-                            </td>
-
+                            <td>{service.productName || "—"}</td>
                           </tr>
-
                         ))}
-
                       </tbody>
-
                     </table>
-
                   </div>
-
                 ) : (
-
                   <div className="rd-k44-empty">
                     No service history available for this chassis.
                   </div>
-
                 )}
-
               </section>
-
             </>
-
           ) : null}
-
         </div>
 
         {/* FOOTER */}
 
         <div className="rd-k44-footer">
-
           <span>
             {record
               ? `${record.serviceCount ?? services.length} service records`
               : "Chassis Master"}
           </span>
 
-          <button
-            type="button"
-            onClick={onClose}
-          >
+          <button type="button" onClick={onClose}>
             Close
           </button>
-
         </div>
-
       </div>
     </div>
   );

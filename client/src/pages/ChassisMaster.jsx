@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   FiRefreshCw,
@@ -40,8 +39,8 @@ function ChassisMaster() {
 
       const response = await api.get(
         `/chassis-master?page=${page}&limit=25&search=${encodeURIComponent(
-          searchValue.trim()
-        )}`
+          searchValue.trim(),
+        )}`,
       );
 
       setRecords(response.data.records || []);
@@ -52,12 +51,11 @@ function ChassisMaster() {
           page: 1,
           limit: 25,
           totalPages: 0,
-        }
+        },
       );
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          "Unable to load Chassis Master data."
+        err.response?.data?.message || "Unable to load Chassis Master data.",
       );
     } finally {
       setLoading(false);
@@ -92,17 +90,14 @@ function ChassisMaster() {
     return new Date(date).toLocaleDateString("en-IN");
   };
 
-  const formatNumber = (value) =>
-    Number(value || 0).toLocaleString("en-IN");
+  const formatNumber = (value) => Number(value || 0).toLocaleString("en-IN");
 
   return (
     <div className="rd-kit-sales-master">
-
       {/* HEADER */}
 
       <div className="rd-kit-sales-master-header">
         <div className="rd-kit-sales-master-title">
-
           <div className="rd-kit-sales-master-breadcrumb">
             DATA MANAGEMENT / CHASSIS MASTER
           </div>
@@ -110,15 +105,12 @@ function ChassisMaster() {
           <h2>Chassis Master</h2>
 
           <p>All unique chassis with linked sales and service history</p>
-
         </div>
 
         <div className="rd-kit-sales-master-header-right">
-
           {/* COUNTS */}
 
           <div className="rd-kit-sales-master-counts">
-
             <div>
               <span>Total Chassis</span>
               <strong>{formatNumber(pagination.total)}</strong>
@@ -135,15 +127,11 @@ function ChassisMaster() {
               <span>Per Page</span>
               <strong>{pagination.limit}</strong>
             </div>
-
           </div>
 
           {/* SEARCH */}
 
-          <form
-            className="rd-kit-sales-master-search"
-            onSubmit={handleSearch}
-          >
+          <form className="rd-kit-sales-master-search" onSubmit={handleSearch}>
             <FiSearch />
 
             <input
@@ -154,11 +142,7 @@ function ChassisMaster() {
             />
 
             {search && (
-              <button
-                type="button"
-                onClick={clearSearch}
-                title="Clear search"
-              >
+              <button type="button" onClick={clearSearch} title="Clear search">
                 <FiX />
               </button>
             )}
@@ -173,48 +157,37 @@ function ChassisMaster() {
             disabled={loading}
           >
             <FiRefreshCw
-              className={
-                loading ? "rd-kit-sales-master-spin" : ""
-              }
+              className={loading ? "rd-kit-sales-master-spin" : ""}
             />
             Refresh
           </button>
-
         </div>
       </div>
 
       {/* TABLE CARD */}
 
       <div className="rd-kit-sales-master-card">
-
         <div className="rd-kit-sales-master-card-heading">
-
           <div>
             <h3>
               <FiDatabase />
               Chassis Master Records
             </h3>
 
-            <p>
-              Sales information and complete linked service history
-            </p>
+            <p>Sales information and complete linked service history</p>
           </div>
 
           <span className="rd-kit-sales-master-record-count">
             {records.length.toLocaleString("en-IN")} Records
           </span>
-
         </div>
 
         {loading ? (
-
           <div className="rd-kit-sales-master-message">
             <FiRefreshCw className="rd-kit-sales-master-spin" />
             Loading Chassis Master records...
           </div>
-
         ) : error ? (
-
           <div className="rd-kit-sales-master-error">
             {error}
 
@@ -225,13 +198,9 @@ function ChassisMaster() {
               Retry
             </button>
           </div>
-
         ) : (
-
           <div className="rd-kit-sales-master-table-scroll">
-
             <table className="rd-kit-sales-master-table">
-
               <thead>
                 <tr>
                   <th>Chassis Number</th>
@@ -240,10 +209,13 @@ function ChassisMaster() {
                   <th>Model</th>
                   <th>Customer Name</th>
                   <th>PIN Code</th>
+                  <th>Place / District</th>
                   <th>Mobile Number</th>
                   <th>Segment</th>
+                  <th>Last Free/Paid</th>
+                  <th>Free/Paid Date</th>
                   <th>Last Service Type</th>
-                  <th>Service Date</th>
+                  <th>Last Service Date</th>
                   <th>Dealer Location</th>
                   <th>Service Count</th>
                   <th>Last Synced</th>
@@ -251,13 +223,9 @@ function ChassisMaster() {
               </thead>
 
               <tbody>
-
                 {records.length > 0 ? (
-
                   records.map((record) => (
-
                     <tr key={record._id}>
-
                       {/* CHASSIS */}
 
                       <td className="rd-kit-sales-master-chassis">
@@ -274,39 +242,30 @@ function ChassisMaster() {
 
                       {/* SALES DATA */}
 
-                      <td>
-                        {formatDate(record.salesData?.deliveryDate)}
-                      </td>
+                      <td>{formatDate(record.salesData?.deliveryDate)}</td>
+
+                      <td>{record.salesData?.saleBranch || "—"}</td>
+
+                      <td>{record.salesData?.modelGroup || "—"}</td>
+
+                      <td>{record.salesData?.customerName || "—"}</td>
+
+                      <td>{record.salesData?.postalCode || "—"}</td>
 
                       <td>
-                        {record.salesData?.saleBranch || "—"}
+                        <div className="rd-kit-sales-master-place">
+                          <strong>{record.place || "—"}</strong>
+                          <small>{record.district || "—"}</small>
+                        </div>
                       </td>
 
-                      <td>
-                        {record.salesData?.modelGroup || "—"}
-                      </td>
+                      <td>{record.salesData?.mobileNumber || "—"}</td>
 
-                      <td>
-                        {record.salesData?.customerName || "—"}
-                      </td>
+                      <td>{record.salesData?.segment || "—"}</td>
 
-                      <td>
-                        {record.salesData?.postalCode || "—"}
-                      </td>
-
-                      <td>
-                        {record.salesData?.mobileNumber || "—"}
-                      </td>
-
-                      <td>
-                        {record.salesData?.segment || "—"}
-                      </td>
-
-                      {/* LAST SERVICE */}
-
+                      {/* LAST FREE OR PAID - EXISTING DATA */}
                       <td>
                         {record.lastFreePaidService?.serviceCategory ? (
-
                           <span
                             className={`rd-kit-sales-master-service-tag ${
                               record.lastFreePaidService.serviceCategory ===
@@ -317,20 +276,25 @@ function ChassisMaster() {
                           >
                             {record.lastFreePaidService.serviceCategory}
                           </span>
-
                         ) : (
                           "—"
                         )}
                       </td>
 
                       <td>
-                        {formatDate(
-                          record.lastFreePaidService?.billDate
-                        )}
+                        {formatDate(record.lastFreePaidService?.billDate)}
                       </td>
 
+                      {/* NEW: LATEST SERVICE TYPE */}
+                      <td>{record.lastServiceType || "—"}</td>
+
+                      {/* NEW: LATEST SERVICE DATE */}
+                      <td>{formatDate(record.lastServiceDate)}</td>
+
                       <td>
-                        {record.lastFreePaidService?.dealerLocation || "—"}
+                        {record.lastServiceDealerLocation ||
+                          record.lastFreePaidService?.dealerLocation ||
+                          "—"}
                       </td>
 
                       {/* SERVICE COUNT */}
@@ -341,54 +305,35 @@ function ChassisMaster() {
                         </span>
                       </td>
 
-                      <td>
-                        {formatDate(record.lastSyncedAt)}
-                      </td>
-
+                      <td>{formatDate(record.lastSyncedAt)}</td>
                     </tr>
-
                   ))
-
                 ) : (
-
                   <tr>
-                    <td
-                      colSpan="13"
-                      className="rd-kit-sales-master-empty"
-                    >
+                    <td colSpan="16" className="rd-kit-sales-master-empty">
                       No Chassis Master records found
                     </td>
                   </tr>
-
                 )}
-
               </tbody>
-
             </table>
-
           </div>
-
         )}
-
       </div>
 
       {/* PAGINATION */}
 
       <div className="rd-kit-sales-master-pagination">
-
         <span>
           Showing {records.length} records on page {pagination.page} of{" "}
           {pagination.totalPages || 1}
         </span>
 
         <div className="rd-kit-sales-master-pagination-buttons">
-
           <button
             type="button"
             disabled={loading || pagination.page <= 1}
-            onClick={() =>
-              fetchChassisMaster(pagination.page - 1)
-            }
+            onClick={() => fetchChassisMaster(pagination.page - 1)}
           >
             <FiChevronLeft />
             Previous
@@ -396,20 +341,13 @@ function ChassisMaster() {
 
           <button
             type="button"
-            disabled={
-              loading ||
-              pagination.page >= pagination.totalPages
-            }
-            onClick={() =>
-              fetchChassisMaster(pagination.page + 1)
-            }
+            disabled={loading || pagination.page >= pagination.totalPages}
+            onClick={() => fetchChassisMaster(pagination.page + 1)}
           >
             Next
             <FiChevronRight />
           </button>
-
         </div>
-
       </div>
 
       {/* CHASSIS DETAILS */}
@@ -420,7 +358,6 @@ function ChassisMaster() {
           onClose={() => setSelectedChassis(null)}
         />
       )}
-
     </div>
   );
 }
