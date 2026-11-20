@@ -1,6 +1,10 @@
 
 const { pool } = require("../config/db");
 const { syncChassisMaster } = require("../services/chassisMasterSyncService");
+const {
+    loadDealerBranchMap,
+    getDealerBranchId,
+} = require("../services/dealerBranchMappingService");
 
 const SOURCE_TABLE =
     "eramsale_service_report.service_bill_status";
@@ -212,6 +216,12 @@ async function runServiceApiSync() {
 
         lockAcquired = true;
 
+        const dealerBranchMap = await loadDealerBranchMap(connection);
+
+        const unmappedDealerLocations = {};
+        let mappedDealerRows = 0;
+        let blankDealerLocationRows = 0;
+
         console.log(
             "[SERVICE MYSQL SYNC] Reading service_bill_status..."
         );
@@ -266,28 +276,30 @@ async function runServiceApiSync() {
         transactionStarted = true;
 
         const insertSQL = `
-            INSERT INTO ro_master_combined (
-                bill_date,
-                dealer_location,
-                repair_order_number,
-                registration_number,
-                chassis_number,
-                service_category,
-                service_type,
-                ro_service_advisor,
-                product_name
-            )
-            VALUES ?
-            ON DUPLICATE KEY UPDATE
-                bill_date = VALUES(bill_date),
-                dealer_location = VALUES(dealer_location),
-                registration_number = VALUES(registration_number),
-                chassis_number = VALUES(chassis_number),
-                service_category = VALUES(service_category),
-                service_type = VALUES(service_type),
-                ro_service_advisor = VALUES(ro_service_advisor),
-                product_name = VALUES(product_name)
-        `;
+    INSERT INTO ro_master_combined (
+        bill_date,
+        dealer_location,
+        dealer_branch_id,
+        repair_order_number,
+        registration_number,
+        chassis_number,
+        service_category,
+        service_type,
+        ro_service_advisor,
+        product_name
+    )
+    VALUES ?
+    ON DUPLICATE KEY UPDATE
+        bill_date = VALUES(bill_date),
+        dealer_location = VALUES(dealer_location),
+        dealer_branch_id = VALUES(dealer_branch_id),
+        registration_number = VALUES(registration_number),
+        chassis_number = VALUES(chassis_number),
+        service_category = VALUES(service_category),
+        service_type = VALUES(service_type),
+        ro_service_advisor = VALUES(ro_service_advisor),
+        product_name = VALUES(product_name)
+`;
 
         let batchesCompleted = 0;
         let submittedRows = 0;
@@ -295,17 +307,34 @@ async function runServiceApiSync() {
         for (let i = 0; i < records.length; i += BATCH_SIZE) {
             const batch = records.slice(i, i + BATCH_SIZE);
 
-            const values = batch.map((record) => [
-                record.billDate,
-                record.dealerLocation,
-                record.roNumber,
-                record.registrationNumber,
-                record.chassisNumber,
-                record.serviceCategory,
-                record.serviceType,
-                record.serviceAdvisor,
-                record.productName,
-            ]);
+            const values = batch.map((record) => {
+                const dealerBranchId = getDealerBranchId(
+                    record.dealerLocation,
+                    dealerBranchMap
+                );
+
+                if (dealerBranchId) {
+                    mappedDealerRows++;
+                } else if (record.dealerLocation) {
+                    unmappedDealerLocations[record.dealerLocation] =
+                        (unmappedDealerLocations[record.dealerLocation] || 0) + 1;
+                } else {
+                    blankDealerLocationRows++;
+                }
+
+                return [
+                    record.billDate,
+                    record.dealerLocation,
+                    dealerBranchId,
+                    record.roNumber,
+                    record.registrationNumber,
+                    record.chassisNumber,
+                    record.serviceCategory,
+                    record.serviceType,
+                    record.serviceAdvisor,
+                    record.productName,
+                ];
+            });
 
             await connection.query(insertSQL, [values]);
 
@@ -360,6 +389,11 @@ async function runServiceApiSync() {
             existingRecordsDeleted: false,
             pincodeHandling: "Existing PIN codes preserved",
             chassisMasterSync,
+            dealerBranchMapping: {
+                mappedRows: mappedDealerRows,
+                unmappedLocations: unmappedDealerLocations,
+                blankLocationRows: blankDealerLocationRows,
+            },
         };
 
 

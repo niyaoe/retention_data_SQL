@@ -714,3 +714,78 @@
 .rd-kit-sales-master-th-filter select:focus {
   border-color: #ff5722;
 }
+
+/* Record count moved to page header */
+
+.rd-kit-sales-master .rd-kit-sales-master-header-right
+.rd-kit-sales-master-record-count {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 11px;
+  background: #fff0e9;
+  color: #e64a19;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Remove unnecessary table card heading spacing */
+
+.rd-kit-sales-master .rd-kit-sales-master-card {
+  border-radius: 4px;
+}
+
+@media (max-width: 700px) {
+  .rd-kit-sales-master .rd-kit-sales-master-header-right
+  .rd-kit-sales-master-record-count {
+    order: 1;
+  }
+}
+
+
+/* chasis column sticky */
+
+/* Sticky Chassis Number column */
+.rd-kit-sales-master-table th:first-child,
+.rd-kit-sales-master-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+  min-width: 160px;
+  white-space: nowrap;
+}
+
+/* Keep header above sticky body cells */
+.rd-kit-sales-master-table thead th:first-child {
+  z-index: 4;
+  background: #f5f5f5;
+}
+
+/* Optional separator */
+.rd-kit-sales-master-table th:first-child,
+.rd-kit-sales-master-table td:first-child {
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+}
+
+
+/* date month filter on free/paid */
+
+.rd-kit-sales-master-th-filter select {
+  width: 100%;
+  min-width: 100px;
+  max-width: 135px;
+  padding: 5px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  background: #fff;
+  color: #e64a19;
+  outline: none;
+  cursor: pointer;
+}

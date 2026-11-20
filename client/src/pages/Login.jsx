@@ -59,7 +59,7 @@ function Login() {
         {/* Title */}
         <div className="rd-login-heading">
           <h1>
-            RETENTION <span>DATA</span>
+            CHASSIS <span>MASTER</span>
           </h1>
 
           <div className="rd-login-line" />

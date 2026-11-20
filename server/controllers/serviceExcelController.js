@@ -2,6 +2,10 @@
 const XLSX = require("xlsx");
 const { pool } = require("../config/db");
 const { syncChassisMaster } = require("../services/chassisMasterSyncService");
+const {
+    loadDealerBranchMap,
+    getDealerBranchId,
+} = require("../services/dealerBranchMappingService");
 
 const REQUIRED_HEADERS = [
     "invoice_date",
@@ -284,15 +288,20 @@ exports.upsertServiceData = async (req, res) => {
 
         lockAcquired = true;
 
+        const dealerBranchMap = await loadDealerBranchMap(connection);
+
+        const unmappedDealerLocations = {};
+
         await connection.beginTransaction();
         transactionStarted = true;
 
         const BATCH_SIZE = 1000;
 
         const insertSQL = `
-      INSERT INTO ro_master_combined (
+    INSERT INTO ro_master_combined (
         bill_date,
         dealer_location,
+        dealer_branch_id,
         repair_order_number,
         ro_date,
         registration_number,
@@ -301,11 +310,12 @@ exports.upsertServiceData = async (req, res) => {
         service_type,
         ro_service_advisor,
         product_name
-      )
-      VALUES ?
-      ON DUPLICATE KEY UPDATE
+    )
+    VALUES ?
+    ON DUPLICATE KEY UPDATE
         bill_date = VALUES(bill_date),
         dealer_location = VALUES(dealer_location),
+        dealer_branch_id = VALUES(dealer_branch_id),
         ro_date = NULL,
         registration_number = VALUES(registration_number),
         chassis_number = VALUES(chassis_number),
@@ -313,26 +323,47 @@ exports.upsertServiceData = async (req, res) => {
         service_type = VALUES(service_type),
         ro_service_advisor = VALUES(ro_service_advisor),
         product_name = VALUES(product_name)
-    `;
+`;
 
         let batchesCompleted = 0;
         let submittedRows = 0;
 
+        let mappedDealerRows = 0;
+        let blankDealerLocationRows = 0;
+
+
         for (let i = 0; i < records.length; i += BATCH_SIZE) {
             const batch = records.slice(i, i + BATCH_SIZE);
 
-            const values = batch.map((record) => [
-                record.billDate,
-                record.dealerLocation,
-                record.roNumber,
-                null,
-                record.registrationNumber,
-                record.chassisNumber,
-                record.serviceCategory,
-                record.serviceType,
-                record.serviceAdvisor,
-                record.productName,
-            ]);
+            const values = batch.map((record) => {
+                const dealerBranchId = getDealerBranchId(
+                    record.dealerLocation,
+                    dealerBranchMap
+                );
+
+                if (dealerBranchId) {
+                    mappedDealerRows++;
+                } else if (record.dealerLocation) {
+                    unmappedDealerLocations[record.dealerLocation] =
+                        (unmappedDealerLocations[record.dealerLocation] || 0) + 1;
+                } else {
+                    blankDealerLocationRows++;
+                }
+
+                return [
+                    record.billDate,
+                    record.dealerLocation,
+                    dealerBranchId,
+                    record.roNumber,
+                    null,
+                    record.registrationNumber,
+                    record.chassisNumber,
+                    record.serviceCategory,
+                    record.serviceType,
+                    record.serviceAdvisor,
+                    record.productName,
+                ];
+            });
 
             await connection.query(insertSQL, [values]);
 
@@ -386,6 +417,12 @@ exports.upsertServiceData = async (req, res) => {
                 importMode: "UPSERT",
                 existingRecordsDeleted: false,
                 chassisMasterSync,
+                dealerBranchMapping: {
+                    mappedRows: mappedDealerRows,
+                    unmappedLocations: unmappedDealerLocations,
+                    blankLocationRows: blankDealerLocationRows,
+                },
+               
             },
         });
 

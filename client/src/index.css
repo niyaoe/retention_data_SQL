@@ -13,13 +13,9 @@ body,
 body {
   min-width: 320px;
   min-height: 100vh;
-  font-family: Roboto, "Segoe UI", Arial, sans-serif;
+  
 }
 
-button,
-input {
-  font: inherit;
-}
 
 .rd-app-loading {
   min-height: 100vh;
@@ -30,4 +26,60 @@ input {
   color: #38c9ed;
   font-size: 12px;
   letter-spacing: 1px;
+}
+
+
+/* =====================================
+   GLOBAL POPPINS FONT
+===================================== */
+
+:root {
+  --app-font: "Poppins", sans-serif;
+}
+
+html,
+body,
+#root {
+  font-family: var(--app-font);
+}
+
+*,
+*::before,
+*::after {
+  font-family: inherit;
+}
+
+button,
+input,
+textarea,
+select,
+option,
+optgroup,
+table,
+th,
+td,
+.bootstrap-select {
+  font-family: var(--app-font) !important;
+}
+
+body {
+  font-weight: 400;
+}
+
+/* Consistent font weights */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--app-font);
+  font-weight: 600;
+}
+
+button,
+.btn {
+  font-weight: 500;
+}
+
+input,
+textarea,
+select {
+  font-weight: 400;
 }

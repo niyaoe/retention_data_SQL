@@ -3,7 +3,6 @@ import {
   FiRefreshCw,
   FiChevronLeft,
   FiChevronRight,
-  FiDatabase,
   FiSearch,
   FiX,
 } from "react-icons/fi";
@@ -31,6 +30,12 @@ function ChassisMaster() {
   const [selectedSaleBranch, setSelectedSaleBranch] = useState("");
   const [branches, setBranches] = useState([]);
 
+  const [selectedDealerBranch, setSelectedDealerBranch] = useState("");
+  const [dealerBranches, setDealerBranches] = useState([]);
+
+  const [freePaidMonths, setFreePaidMonths] = useState([]);
+  const [selectedFreePaidMonth, setSelectedFreePaidMonth] = useState("");
+
   // ========================================
   // FETCH CHASSIS MASTER
   // ========================================
@@ -39,6 +44,8 @@ function ChassisMaster() {
     page = 1,
     searchValue = search,
     branchValue = selectedSaleBranch,
+    dealerBranchValue = selectedDealerBranch,
+    monthValue = selectedFreePaidMonth,
   ) => {
     try {
       setLoading(true);
@@ -47,11 +54,15 @@ function ChassisMaster() {
       const response = await api.get(
         `/chassis-master?page=${page}&limit=25&search=${encodeURIComponent(
           searchValue.trim(),
-        )}&saleBranch=${encodeURIComponent(branchValue)}`,
+        )}&saleBranch=${encodeURIComponent(
+          branchValue,
+        )}&dealerBranchId=${encodeURIComponent(dealerBranchValue)}&freePaidMonth=${encodeURIComponent(monthValue)}`,
       );
 
       setRecords(response.data.records || []);
       setBranches(response.data.branches || []);
+      setDealerBranches(response.data.dealerBranches || []);
+      setFreePaidMonths(response.data.freePaidMonths || []);
 
       setPagination(
         response.data.pagination || {
@@ -116,6 +127,10 @@ function ChassisMaster() {
         </div>
 
         <div className="rd-kit-sales-master-header-right">
+          {/* RECORD COUNT */}
+          <span className="rd-kit-sales-master-record-count">
+            {records.length.toLocaleString("en-IN")} Records
+          </span>
           {/* COUNTS */}
 
           <div className="rd-kit-sales-master-counts">
@@ -175,21 +190,6 @@ function ChassisMaster() {
       {/* TABLE CARD */}
 
       <div className="rd-kit-sales-master-card">
-        <div className="rd-kit-sales-master-card-heading">
-          <div>
-            <h3>
-              <FiDatabase />
-              Chassis Master Records
-            </h3>
-
-            <p>Sales information and complete linked service history</p>
-          </div>
-
-          <span className="rd-kit-sales-master-record-count">
-            {records.length.toLocaleString("en-IN")} Records
-          </span>
-        </div>
-
         {loading ? (
           <div className="rd-kit-sales-master-message">
             <FiRefreshCw className="rd-kit-sales-master-spin" />
@@ -222,7 +222,14 @@ function ChassisMaster() {
                         onChange={(e) => {
                           const value = e.target.value;
                           setSelectedSaleBranch(value);
-                          fetchChassisMaster(1, search, value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            value,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                          );
                         }}
                       >
                         <option value="">All Branches</option>
@@ -242,10 +249,66 @@ function ChassisMaster() {
                   <th>Mobile Number</th>
                   <th>Segment</th>
                   <th>Last Free/Paid</th>
-                  <th>Free/Paid Date</th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Free/Paid Date</span>
+
+                      <select
+                        value={selectedFreePaidMonth}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedFreePaidMonth(value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            value,
+                          );
+                        }}
+                      >
+                        <option value="">All Months</option>
+
+                        {freePaidMonths.map((month) => (
+                          <option key={month.value} value={month.value}>
+                            {month.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </th>
                   <th>Last Service Type</th>
                   <th>Last Service Date</th>
-                  <th>Dealer Location</th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Dealer Location</span>
+
+                      <select
+                        value={selectedDealerBranch}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedDealerBranch(value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            value,
+                            selectedFreePaidMonth,
+                          );
+                        }}
+                      >
+                        <option value="">All Dealer Branches</option>
+
+                        {dealerBranches.map((branch) => (
+                          <option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </th>
                   <th>Service Count</th>
                   <th>Last Synced</th>
                 </tr>

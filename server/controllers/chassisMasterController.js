@@ -1,4 +1,3 @@
-
 const { pool } = require("../config/db");
 
 // ========================================
@@ -7,19 +6,84 @@ const { pool } = require("../config/db");
 
 const getChassisMaster = async (req, res) => {
     try {
-        const page = Math.max(
-            1,
-            Number.parseInt(req.query.page, 10) || 1
-        );
+        const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
 
         const limit = Math.min(
             100,
-            Math.max(1, Number.parseInt(req.query.limit, 10) || 25)
+            Math.max(1, Number.parseInt(req.query.limit, 10) || 25),
         );
 
         const search = String(req.query.search || "").trim();
         const offset = (page - 1) * limit;
+
         const saleBranch = String(req.query.saleBranch || "").trim();
+        const dealerBranchId = String(req.query.dealerBranchId || "").trim();
+
+        const freePaidMonth = String(req.query.freePaidMonth || "").trim();
+
+        const [monthRows] = await pool.query(`
+    SELECT DISTINCT
+        DATE_FORMAT(fp.bill_date, '%Y-%m') AS monthValue
+    FROM ro_master_combined fp
+    INNER JOIN chassis_master cm
+        ON cm.chassis_no = fp.chassis_number
+    WHERE fp.service_category IN ('Free Service', 'Paid Service')
+      AND fp.bill_date IS NOT NULL
+      AND NOT EXISTS (
+          SELECT 1
+          FROM ro_master_combined newer
+          WHERE newer.chassis_number = fp.chassis_number
+            AND newer.service_category IN ('Free Service', 'Paid Service')
+            AND (
+                newer.bill_date > fp.bill_date
+                OR (
+                    newer.bill_date = fp.bill_date
+                    AND newer.id > fp.id
+                )
+            )
+      )
+    ORDER BY monthValue DESC
+`);
+
+        const monthNames = [
+            "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+            "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+        ];
+
+        const freePaidMonths = monthRows.map((row) => {
+            const [year, month] = row.monthValue.split("-");
+
+            return {
+                value: row.monthValue,
+                label: `${monthNames[Number(month) - 1]}-${year.slice(-2)}`,
+            };
+        });
+
+        let freePaidStart = null;
+        let freePaidEnd = null;
+
+        if (freePaidMonth) {
+            if (!/^\d{4}-\d{2}$/.test(freePaidMonth)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Free/Paid month",
+                });
+            }
+
+            const [year, month] = freePaidMonth.split("-").map(Number);
+
+            if (month < 1 || month > 12) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Free/Paid month",
+                });
+            }
+
+            freePaidStart = `${freePaidMonth}-01`;
+            freePaidEnd = new Date(Date.UTC(year, month, 1))
+                .toISOString()
+                .slice(0, 10);
+        }
 
         const conditions = [];
         const searchParams = [];
@@ -46,9 +110,7 @@ const getChassisMaster = async (req, res) => {
 
             const term = `%${search}%`;
 
-            searchParams.push(
-                term, term, term, term, term, term, term
-            );
+            searchParams.push(term, term, term, term, term, term, term);
         }
 
         if (saleBranch) {
@@ -56,11 +118,61 @@ const getChassisMaster = async (req, res) => {
             searchParams.push(saleBranch);
         }
 
+        if (dealerBranchId) {
+            if (!/^\d+$/.test(dealerBranchId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Dealer Branch ID",
+                });
+            }
+
+            conditions.push(`
+        EXISTS (
+            SELECT 1
+            FROM ro_master_combined dl
+            WHERE dl.id = (
+                SELECT dl2.id
+                FROM ro_master_combined dl2
+                WHERE dl2.chassis_number = cm.chassis_no
+                ORDER BY dl2.bill_date DESC, dl2.id DESC
+                LIMIT 1
+            )
+            AND dl.dealer_branch_id = ?
+        )
+    `);
+
+            searchParams.push(Number(dealerBranchId));
+        }
+
+        if (freePaidMonth) {
+            conditions.push(`
+        EXISTS (
+            SELECT 1
+            FROM ro_master_combined fp
+            WHERE fp.id = (
+                SELECT fp2.id
+                FROM ro_master_combined fp2
+                WHERE fp2.chassis_number = cm.chassis_no
+                  AND fp2.service_category IN (
+                      'Free Service',
+                      'Paid Service'
+                  )
+                ORDER BY fp2.bill_date DESC, fp2.id DESC
+                LIMIT 1
+            )
+            AND fp.bill_date >= ?
+            AND fp.bill_date < ?
+        )
+    `);
+
+            searchParams.push(freePaidStart, freePaidEnd);
+        }
+
+
+
         const whereClause = conditions.length
             ? `WHERE ${conditions.join(" AND ")}`
             : "";
-
-
 
         const countStartedAt = Date.now();
 
@@ -73,17 +185,16 @@ const getChassisMaster = async (req, res) => {
                     ON s.id = cm.sales_data_id
                 ${whereClause}
             `,
-            searchParams
+            searchParams,
         );
 
         console.log(
-            `[Chassis Master] Count query: ${Date.now() - countStartedAt} ms`
+            `[Chassis Master] Count query: ${Date.now() - countStartedAt} ms`,
         );
 
         const total = Number(countResult[0].total);
 
         const recordsStartedAt = Date.now();
-
 
         // 2. Get chassis list and latest Free/Paid service
 
@@ -117,9 +228,10 @@ const getChassisMaster = async (req, res) => {
             last_service.ro_service_advisor AS last_service_advisor,
             last_service.product_name AS last_service_product,
 
-            last_any_service.service_type AS last_service_type_any,
+last_any_service.service_type AS last_service_type_any,
 last_any_service.bill_date AS last_service_date_any,
 last_any_service.dealer_location AS last_service_location_any,
+last_any_branch.branch_name AS last_service_branch_name_any,
 
             pin_details.places AS pin_places,
             pin_details.districts AS pin_districts
@@ -174,6 +286,8 @@ last_any_service.dealer_location AS last_service_location_any,
                 ORDER BY s3.bill_date DESC, s3.id DESC
                 LIMIT 1
             )
+                LEFT JOIN branch_master last_any_branch
+    ON last_any_branch.id = last_any_service.dealer_branch_id
 
         LEFT JOIN (
             SELECT
@@ -197,12 +311,11 @@ last_any_service.dealer_location AS last_service_location_any,
 
         ORDER BY base.id DESC
     `,
-            [...searchParams, limit, offset]
+            [...searchParams, limit, offset],
         );
 
-
         console.log(
-            `[Chassis Master] Records query: ${Date.now() - recordsStartedAt} ms`
+            `[Chassis Master] Records query: ${Date.now() - recordsStartedAt} ms`,
         );
 
         // 3. Format response
@@ -246,30 +359,52 @@ last_any_service.dealer_location AS last_service_location_any,
                 lastSyncedAt: row.updated_at,
                 lastServiceType: row.last_service_type_any || null,
                 lastServiceDate: row.last_service_date_any || null,
-                lastServiceDealerLocation: row.last_service_location_any || null,
+                lastServiceDealerLocation:
+                    row.last_service_branch_name_any ||
+                    row.last_service_location_any ||
+                    null,
                 place: row.pin_places || null,
                 district: row.pin_districts || null,
             };
         });
 
         console.log(
-            `[Chassis Master] Total controller time: ${Date.now() - countStartedAt} ms`
+            `[Chassis Master] Total controller time: ${Date.now() - countStartedAt} ms`,
         );
 
+        // Only branches that have sales-linked chassis records
         const [branchRows] = await pool.query(`
-    SELECT DISTINCT branch_name
+    SELECT DISTINCT s.sale_branch
+    FROM chassis_master cm
+    INNER JOIN sales_data_combined s
+        ON s.id = cm.sales_data_id
+    WHERE s.sale_branch IS NOT NULL
+      AND TRIM(s.sale_branch) <> ''
+    ORDER BY s.sale_branch
+`);
+
+        const branches = branchRows.map((row) => row.sale_branch);
+
+        const [dealerBranchRows] = await pool.query(`
+    SELECT id, branch_name
     FROM branch_master
-    WHERE branch_name IS NOT NULL
+    WHERE is_active = 1
+      AND branch_name IS NOT NULL
       AND TRIM(branch_name) <> ''
     ORDER BY branch_name
 `);
 
-        const branches = branchRows.map(row => row.branch_name);
+        const dealerBranches = dealerBranchRows.map((row) => ({
+            id: row.id,
+            branchName: row.branch_name,
+        }));
 
         return res.status(200).json({
             success: true,
             records: formattedRecords,
             branches,
+            dealerBranches,
+            freePaidMonths,
             pagination: {
                 total,
                 page,
@@ -277,7 +412,6 @@ last_any_service.dealer_location AS last_service_location_any,
                 totalPages: Math.ceil(total / limit),
             },
         });
-
     } catch (error) {
         console.error("MySQL Chassis Master Error:", error);
 
@@ -287,7 +421,6 @@ last_any_service.dealer_location AS last_service_location_any,
         });
     }
 };
-
 
 // ========================================
 // GET CHASSIS DETAILS + COMPLETE HISTORY
@@ -355,7 +488,7 @@ pin_details.districts AS pin_districts
                 WHERE cm.chassis_no = ?
                 LIMIT 1
             `,
-            [chassisNumber]
+            [chassisNumber],
         );
 
         if (!masterRows.length) {
@@ -392,7 +525,7 @@ pin_details.districts AS pin_districts
                     bill_date DESC,
                     id DESC
             `,
-            [master.chassis_no]
+            [master.chassis_no],
         );
 
         // 3. Format service history
@@ -446,7 +579,6 @@ pin_details.districts AS pin_districts
             success: true,
             record,
         });
-
     } catch (error) {
         console.error("MySQL Chassis Master Details Error:", error);
 
@@ -456,7 +588,6 @@ pin_details.districts AS pin_districts
         });
     }
 };
-
 
 module.exports = {
     getChassisMaster,
