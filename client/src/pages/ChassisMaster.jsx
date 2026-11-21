@@ -36,6 +36,8 @@ function ChassisMaster() {
   const [freePaidMonths, setFreePaidMonths] = useState([]);
   const [selectedFreePaidMonth, setSelectedFreePaidMonth] = useState("");
 
+  const [locationFilter, setLocationFilter] = useState("");
+
   // ========================================
   // FETCH CHASSIS MASTER
   // ========================================
@@ -46,6 +48,7 @@ function ChassisMaster() {
     branchValue = selectedSaleBranch,
     dealerBranchValue = selectedDealerBranch,
     monthValue = selectedFreePaidMonth,
+    locationValue = locationFilter,
   ) => {
     try {
       setLoading(true);
@@ -56,7 +59,11 @@ function ChassisMaster() {
           searchValue.trim(),
         )}&saleBranch=${encodeURIComponent(
           branchValue,
-        )}&dealerBranchId=${encodeURIComponent(dealerBranchValue)}&freePaidMonth=${encodeURIComponent(monthValue)}`,
+        )}&dealerBranchId=${encodeURIComponent(
+          dealerBranchValue,
+        )}&freePaidMonth=${encodeURIComponent(
+          monthValue,
+        )}&locationFilter=${encodeURIComponent(locationValue.trim())}`,
       );
 
       setRecords(response.data.records || []);
@@ -245,7 +252,54 @@ function ChassisMaster() {
                   <th>Model</th>
                   <th>Customer Name</th>
                   <th>PIN Code</th>
-                  <th>Place / District</th>
+                  <th className="rd-kit-location-filter-th">
+                    <div className="rd-kit-location-filter">
+                      <span>Place / District</span>
+
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                            locationFilter,
+                          );
+                        }}
+                      >
+                        <input
+                          type="text"
+                          placeholder="PIN / Place / District"
+                          value={locationFilter}
+                          onChange={(e) => setLocationFilter(e.target.value)}
+                        />
+
+                        {locationFilter && (
+                          <button
+                            type="button"
+                            title="Clear location filter"
+                            onClick={() => {
+                              setLocationFilter("");
+
+                              fetchChassisMaster(
+                                1,
+                                search,
+                                selectedSaleBranch,
+                                selectedDealerBranch,
+                                selectedFreePaidMonth,
+                                "",
+                              );
+                            }}
+                          >
+                            <FiX />
+                          </button>
+                        )}
+                      </form>
+                    </div>
+                  </th>
                   <th>Mobile Number</th>
                   <th>Segment</th>
                   <th>Last Free/Paid</th>

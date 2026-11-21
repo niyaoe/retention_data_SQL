@@ -789,3 +789,74 @@
   outline: none;
   cursor: pointer;
 }
+
+
+/* ========================================
+   PIN / PLACE / DISTRICT FILTER
+======================================== */
+
+.rd-kit-sales-master .rd-kit-location-filter-th {
+  min-width: 180px;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter > span {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter input {
+  width: 100%;
+  min-width: 0;
+  height: 29px;
+  padding: 4px 7px;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  outline: none;
+  background: #fff;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter input:focus {
+  border-color: #e64a19;
+  box-shadow: 0 0 0 2px rgba(230, 74, 25, 0.1);
+}
+
+.rd-kit-sales-master .rd-kit-location-filter input::placeholder {
+  color: #999;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter form button {
+  flex-shrink: 0;
+  width: 25px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: #f1f1f1;
+  color: #777;
+  cursor: pointer;
+}
+
+.rd-kit-sales-master .rd-kit-location-filter form button:hover {
+  background: #fff0e9;
+  color: #e64a19;
+}

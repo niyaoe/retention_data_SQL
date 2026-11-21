@@ -20,6 +20,12 @@ const getChassisMaster = async (req, res) => {
         const dealerBranchId = String(req.query.dealerBranchId || "").trim();
 
         const freePaidMonth = String(req.query.freePaidMonth || "").trim();
+        const locationFilter = String(
+            req.query.locationFilter || ""
+        ).trim();
+
+        const conditions = [];
+        const searchParams = [];
 
         const [monthRows] = await pool.query(`
     SELECT DISTINCT
@@ -81,8 +87,26 @@ const getChassisMaster = async (req, res) => {
                 .slice(0, 10);
         }
 
-        const conditions = [];
-        const searchParams = [];
+        if (locationFilter) {
+            const locationTerm = `%${locationFilter}%`;
+
+            conditions.push(`
+        (
+            s.postal_code LIKE ?
+            OR pin_filter_details.places LIKE ?
+            OR pin_filter_details.districts LIKE ?
+        )
+    `);
+
+            searchParams.push(
+                locationTerm,
+                locationTerm,
+                locationTerm
+            );
+        }
+
+
+
 
         if (search) {
             conditions.push(`
@@ -148,10 +172,15 @@ const getChassisMaster = async (req, res) => {
         FROM chassis_master cm
 
         LEFT JOIN sales_data_combined s
-            ON s.id = cm.sales_data_id
+    ON s.id = cm.sales_data_id
 
-        LEFT JOIN chassis_service_summary css
-            ON css.chassis_number = cm.chassis_no
+${locationFilter ? `
+LEFT JOIN pincode_lookup_summary pin_filter_details
+    ON pin_filter_details.pincode = TRIM(s.postal_code)
+` : ""}
+
+LEFT JOIN chassis_service_summary css
+    ON css.chassis_number = cm.chassis_no
 
         ${whereClause}
     `,
@@ -228,11 +257,16 @@ const getChassisMaster = async (req, res) => {
 
         FROM chassis_master cm
 
-        LEFT JOIN sales_data_combined s
-            ON s.id = cm.sales_data_id
+       LEFT JOIN sales_data_combined s
+    ON s.id = cm.sales_data_id
 
-        LEFT JOIN chassis_service_summary css
-            ON css.chassis_number = cm.chassis_no
+${locationFilter ? `
+LEFT JOIN pincode_lookup_summary pin_filter_details
+    ON pin_filter_details.pincode = TRIM(s.postal_code)
+` : ""}
+
+LEFT JOIN chassis_service_summary css
+    ON css.chassis_number = cm.chassis_no
 
         ${whereClause}
 
