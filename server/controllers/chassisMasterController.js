@@ -213,7 +213,11 @@ LEFT JOIN chassis_service_summary css
         base.cust_name,
         base.postal_code,
         base.mobile_no,
-        base.segment,
+
+COALESCE(
+    NULLIF(TRIM(base.segment), ''),
+    NULLIF(TRIM(last_any_service.segment), '')
+) AS segment,
 
         last_service.id AS last_service_id,
         last_service.bill_date AS last_service_bill_date,
@@ -332,6 +336,7 @@ LEFT JOIN chassis_service_summary css
                 _id: row.id,
                 chassisNumber: row.chassis_no,
                 salesData,
+                segment: row.segment || null,
                 lastFreePaidService,
                 serviceCount: Number(row.service_count || 0),
                 lastSyncedAt: row.updated_at,

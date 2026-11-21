@@ -407,7 +407,7 @@ function ChassisMaster() {
 
                       <td>{record.salesData?.mobileNumber || "—"}</td>
 
-                      <td>{record.salesData?.segment || "—"}</td>
+                      <td>{record.segment || "—"}</td>
 
                       {/* LAST FREE OR PAID - EXISTING DATA */}
                       <td>
