@@ -6,6 +6,11 @@ const {
     getDealerBranchId,
 } = require("../services/dealerBranchMappingService");
 
+const {
+    captureAffectedChassis,
+    refreshChassisServiceSummary,
+} = require("../services/chassisServiceSummaryService");
+
 const SOURCE_TABLE =
     "eramsale_service_report.service_bill_status";
 
@@ -271,6 +276,15 @@ async function runServiceApiSync() {
                 message: "No eligible unique RO records found.",
             };
         }
+        // Identify old and new chassis before UPSERT
+        const affectedChassis = await captureAffectedChassis(
+            connection,
+            records
+        );
+
+        console.log(
+            `[SERVICE MYSQL SYNC] Affected chassis identified: ${affectedChassis.size}`
+        );
 
         await connection.beginTransaction();
         transactionStarted = true;
@@ -373,6 +387,40 @@ async function runServiceApiSync() {
         }
 
         // ========================================
+        // UPDATE CHASSIS SERVICE SUMMARY
+        // ========================================
+
+        let chassisServiceSummarySync = null;
+
+        try {
+            console.log(
+                "[SERVICE MYSQL SYNC] Updating Chassis Service Summary..."
+            );
+
+            chassisServiceSummarySync =
+                await refreshChassisServiceSummary(
+                    affectedChassis,
+                    connection
+                );
+
+            console.log(
+                "[SERVICE MYSQL SYNC] Summary update completed:",
+                chassisServiceSummarySync
+            );
+
+        } catch (summaryError) {
+            console.error(
+                "[SERVICE MYSQL SYNC] Summary update failed:",
+                summaryError
+            );
+
+            chassisServiceSummarySync = {
+                success: false,
+                message: summaryError.message,
+            };
+        }
+
+        // ========================================
         // 6. FINAL REPORT
         // ========================================
 
@@ -389,6 +437,7 @@ async function runServiceApiSync() {
             existingRecordsDeleted: false,
             pincodeHandling: "Existing PIN codes preserved",
             chassisMasterSync,
+            chassisServiceSummarySync,
             dealerBranchMapping: {
                 mappedRows: mappedDealerRows,
                 unmappedLocations: unmappedDealerLocations,

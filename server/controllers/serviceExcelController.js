@@ -7,6 +7,11 @@ const {
     getDealerBranchId,
 } = require("../services/dealerBranchMappingService");
 
+const {
+    captureAffectedChassis,
+    refreshChassisServiceSummary,
+} = require("../services/chassisServiceSummaryService");
+
 const REQUIRED_HEADERS = [
     "invoice_date",
     "location_name",
@@ -292,6 +297,17 @@ exports.upsertServiceData = async (req, res) => {
 
         const unmappedDealerLocations = {};
 
+        // Capture old and new chassis numbers before UPSERT.
+        // This is needed when an existing RO changes chassis number.
+        const affectedChassis = await captureAffectedChassis(
+            connection,
+            records
+        );
+
+        console.log(
+            `[SERVICE EXCEL] Affected chassis identified: ${affectedChassis.size}`
+        );
+
         await connection.beginTransaction();
         transactionStarted = true;
 
@@ -403,6 +419,40 @@ exports.upsertServiceData = async (req, res) => {
         }
 
         // ========================================
+        // UPDATE CHASSIS SERVICE SUMMARY
+        // ========================================
+
+        let chassisServiceSummarySync = null;
+
+        try {
+            console.log(
+                "[SERVICE EXCEL] Updating Chassis Service Summary..."
+            );
+
+            chassisServiceSummarySync =
+                await refreshChassisServiceSummary(
+                    affectedChassis,
+                    connection
+                );
+
+            console.log(
+                "[SERVICE EXCEL] Summary update completed:",
+                chassisServiceSummarySync
+            );
+
+        } catch (summaryError) {
+            console.error(
+                "[SERVICE EXCEL] Summary update failed:",
+                summaryError
+            );
+
+            chassisServiceSummarySync = {
+                success: false,
+                message: summaryError.message,
+            };
+        }
+
+        // ========================================
         // SUCCESS RESPONSE
         // ========================================
 
@@ -417,12 +467,13 @@ exports.upsertServiceData = async (req, res) => {
                 importMode: "UPSERT",
                 existingRecordsDeleted: false,
                 chassisMasterSync,
+                chassisServiceSummarySync,
                 dealerBranchMapping: {
                     mappedRows: mappedDealerRows,
                     unmappedLocations: unmappedDealerLocations,
                     blankLocationRows: blankDealerLocationRows,
                 },
-               
+
             },
         });
 

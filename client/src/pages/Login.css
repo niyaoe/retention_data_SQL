@@ -21,7 +21,7 @@
   background-repeat: no-repeat;
 
   color: var(--rd-white);
-  font-family: inherit;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Dark Ambient Overlay */
@@ -147,7 +147,7 @@
 
   color: #ffffff;
   font-size: 13px;
-  font-family: inherit;
+  font-family: 'Poppins', sans-serif;
 }
 
 .rd-login-input-wrap input::placeholder {

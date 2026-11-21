@@ -33,8 +33,8 @@ function Header({ user, onMenuClick }) {
         </button>
 
         <div className="rd-kit-header-title">
-          <h1>Retention Data</h1>
-          <span>Management System</span>
+          <h1>CHASSIS MASTER</h1>
+          <span>Retention data</span>
         </div>
       </div>
 

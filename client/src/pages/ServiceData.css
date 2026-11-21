@@ -18,7 +18,7 @@
   min-height: 0;
   padding: 16px;
   color: var(--rssd-text);
-  font-family: Roboto, Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 13px;
   box-sizing: border-box;
 
@@ -120,7 +120,7 @@
   border-radius: 3px;
   background: var(--rssd-orange);
   color: white;
-  font-family: inherit;
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -341,7 +341,7 @@
   border-radius: 3px;
   background: white;
   color: #555;
-  font-family: inherit;
+  font-family: 'Poppins', sans-serif;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
