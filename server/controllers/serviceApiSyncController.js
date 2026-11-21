@@ -7,6 +7,11 @@ const {
 } = require("../services/dealerBranchMappingService");
 
 const {
+    loadModelSegmentMap,
+    getModelSegment,
+} = require("../services/modelSegmentMappingService");
+
+const {
     captureAffectedChassis,
     refreshChassisServiceSummary,
 } = require("../services/chassisServiceSummaryService");
@@ -222,6 +227,7 @@ async function runServiceApiSync() {
         lockAcquired = true;
 
         const dealerBranchMap = await loadDealerBranchMap(connection);
+        const modelSegmentMap = await loadModelSegmentMap(connection);
 
         const unmappedDealerLocations = {};
         let mappedDealerRows = 0;
@@ -300,7 +306,8 @@ async function runServiceApiSync() {
         service_category,
         service_type,
         ro_service_advisor,
-        product_name
+        product_name,
+        segment
     )
     VALUES ?
     ON DUPLICATE KEY UPDATE
@@ -312,7 +319,8 @@ async function runServiceApiSync() {
         service_category = VALUES(service_category),
         service_type = VALUES(service_type),
         ro_service_advisor = VALUES(ro_service_advisor),
-        product_name = VALUES(product_name)
+        product_name = VALUES(product_name),
+        segment = COALESCE(VALUES(segment), segment)
 `;
 
         let batchesCompleted = 0;
@@ -347,6 +355,7 @@ async function runServiceApiSync() {
                     record.serviceType,
                     record.serviceAdvisor,
                     record.productName,
+                    getModelSegment(record.productName, modelSegmentMap),
                 ];
             });
 

@@ -154,6 +154,7 @@ function ServiceData() {
                   <th>Service Type</th>
                   <th>Service Advisor</th>
                   <th>Product</th>
+                  <th>Segment</th>
                   <th>Created At</th>
                 </tr>
               </thead>
@@ -176,6 +177,7 @@ function ServiceData() {
                       <td>{record.service_type || "—"}</td>
                       <td>{record.ro_service_advisor || "—"}</td>
                       <td>{record.product_name || "—"}</td>
+                      <td>{record.segment || "—"}</td>
                       <td>{formatDate(record.created_at)}</td>
                     </tr>
                   ))

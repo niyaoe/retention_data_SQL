@@ -531,3 +531,12 @@
     align-items: flex-start;
   }
 }
+
+
+.rd-kit-service-data .rd-kit-service-data-table {
+    width: 100%;
+    min-width: 1450px;
+    border-collapse: collapse;
+    font-size: 11px;
+    white-space: nowrap;
+}

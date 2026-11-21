@@ -33,6 +33,7 @@ const getServiceData = async (req, res) => {
         service_type,
         ro_service_advisor,
         product_name,
+        segment,
         created_at
       FROM ro_master_combined
       ORDER BY id DESC
