@@ -211,8 +211,10 @@ LEFT JOIN chassis_service_summary css
         base.sale_branch,
         base.model_group,
         base.cust_name,
-        base.postal_code,
-        base.mobile_no,
+base.postal_code,
+base.mobile_no,
+
+base.segment AS sales_segment,
 
 COALESCE(
     NULLIF(TRIM(base.segment), ''),
@@ -328,7 +330,7 @@ LEFT JOIN chassis_service_summary css
                     customerName: row.cust_name,
                     postalCode: row.postal_code,
                     mobileNumber: row.mobile_no,
-                    segment: row.segment,
+                    segment: row.sales_segment || null,
                 }
                 : null;
 
@@ -439,7 +441,12 @@ const getChassisMasterDetails = async (req, res) => {
                     s.cust_name,
                     s.postal_code,
                     s.mobile_no,
-s.segment,
+s.segment AS sales_segment,
+
+COALESCE(
+    NULLIF(TRIM(s.segment), ''),
+    NULLIF(TRIM(latest_service.segment), '')
+) AS segment,
 pin_details.places AS pin_places,
 pin_details.districts AS pin_districts
 
@@ -447,6 +454,12 @@ pin_details.districts AS pin_districts
 
                 LEFT JOIN sales_data_combined s
                     ON s.id = cm.sales_data_id
+
+                    LEFT JOIN chassis_service_summary css
+    ON css.chassis_number = cm.chassis_no
+
+LEFT JOIN ro_master_combined latest_service
+    ON latest_service.id = css.latest_service_id
 
                    LEFT JOIN pincode_lookup_summary pin_details
     ON pin_details.pincode = TRIM(s.postal_code)
@@ -477,11 +490,12 @@ pin_details.districts AS pin_districts
                     ro_date,
                     registration_number,
                     chassis_number,
-                    service_category,
-                    service_type,
-                    ro_service_advisor,
-                    product_name,
-                    created_at
+                   service_category,
+service_type,
+ro_service_advisor,
+product_name,
+segment,
+created_at
 
                 FROM ro_master_combined
 
@@ -507,6 +521,7 @@ pin_details.districts AS pin_districts
             serviceType: service.service_type,
             roServiceAdvisor: service.ro_service_advisor,
             productName: service.product_name,
+            segment: service.segment || null,
             sourceCreatedAt: service.created_at,
         }));
 
@@ -519,7 +534,7 @@ pin_details.districts AS pin_districts
                 customerName: master.cust_name,
                 postalCode: master.postal_code,
                 mobileNumber: master.mobile_no,
-                segment: master.segment,
+                segment: master.sales_segment || null,
             }
             : null;
 
@@ -532,6 +547,7 @@ pin_details.districts AS pin_districts
 
             place: master.pin_places || null,
             district: master.pin_districts || null,
+            segment: master.segment || null,
 
             serviceRecords,
             serviceCount: Number(master.service_count || 0),
