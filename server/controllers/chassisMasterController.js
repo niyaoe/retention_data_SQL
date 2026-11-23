@@ -23,6 +23,8 @@ const getChassisMaster = async (req, res) => {
         const locationFilter = String(
             req.query.locationFilter || ""
         ).trim();
+        const segmentFilter = String(req.query.segment || "").trim();
+        const deliveryMonth = String(req.query.deliveryMonth || "").trim();
 
         const conditions = [];
         const searchParams = [];
@@ -87,6 +89,16 @@ const getChassisMaster = async (req, res) => {
                 .slice(0, 10);
         }
 
+        if (segmentFilter) {
+            conditions.push(`
+        COALESCE(
+            NULLIF(TRIM(s.segment), ''),
+            NULLIF(TRIM(segment_service.segment), '')
+        ) = ?
+    `);
+            searchParams.push(segmentFilter);
+        }
+
         if (locationFilter) {
             const locationTerm = `%${locationFilter}%`;
 
@@ -138,7 +150,10 @@ const getChassisMaster = async (req, res) => {
             searchParams.push(saleBranch);
         }
 
-        if (dealerBranchId) {
+        if (dealerBranchId === "blank") {
+            // Records without an assigned dealer branch
+            conditions.push("css.latest_service_branch_id IS NULL");
+        } else if (dealerBranchId) {
             if (!/^\d+$/.test(dealerBranchId)) {
                 return res.status(400).json({
                     success: false,
@@ -157,6 +172,42 @@ const getChassisMaster = async (req, res) => {
     `);
 
             searchParams.push(freePaidStart, freePaidEnd);
+        }
+
+        let deliveryStart = null;
+        let deliveryEnd = null;
+
+        if (deliveryMonth) {
+            if (!/^\d{4}-\d{2}$/.test(deliveryMonth)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Delivery Date month",
+                });
+            }
+
+            const [year, month] = deliveryMonth.split("-").map(Number);
+
+            if (month < 1 || month > 12) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Delivery Date month",
+                });
+            }
+
+            deliveryStart = `${deliveryMonth}-01`;
+
+            deliveryEnd = new Date(Date.UTC(year, month, 1))
+                .toISOString()
+                .slice(0, 10);
+        }
+
+        if (deliveryMonth) {
+            conditions.push(`
+        s.delivery_date >= ?
+        AND s.delivery_date < ?
+    `);
+
+            searchParams.push(deliveryStart, deliveryEnd);
         }
 
         const whereClause = conditions.length
@@ -181,6 +232,9 @@ LEFT JOIN pincode_lookup_summary pin_filter_details
 
 LEFT JOIN chassis_service_summary css
     ON css.chassis_number = cm.chassis_no
+
+    LEFT JOIN ro_master_combined segment_service
+    ON segment_service.id = css.latest_service_id
 
         ${whereClause}
     `,
@@ -273,6 +327,9 @@ LEFT JOIN pincode_lookup_summary pin_filter_details
 
 LEFT JOIN chassis_service_summary css
     ON css.chassis_number = cm.chassis_no
+
+    LEFT JOIN ro_master_combined segment_service
+    ON segment_service.id = css.latest_service_id
 
         ${whereClause}
 
@@ -384,12 +441,64 @@ LEFT JOIN chassis_service_summary css
             branchName: row.branch_name,
         }));
 
+        const [segmentRows] = await pool.query(`
+    SELECT DISTINCT resolved.segment
+    FROM (
+        SELECT
+            COALESCE(
+                NULLIF(TRIM(s.segment), ''),
+                NULLIF(TRIM(rs.segment), '')
+            ) AS segment
+        FROM chassis_master cm
+        LEFT JOIN sales_data_combined s
+            ON s.id = cm.sales_data_id
+        LEFT JOIN chassis_service_summary css
+            ON css.chassis_number = cm.chassis_no
+        LEFT JOIN ro_master_combined rs
+            ON rs.id = css.latest_service_id
+    ) AS resolved
+    WHERE resolved.segment IS NOT NULL
+      AND resolved.segment <> ''
+    ORDER BY resolved.segment
+`);
+
+        const segments = segmentRows.map(row => row.segment);
+
+        const [deliveryMonthRows] = await pool.query(`
+    SELECT DISTINCT
+        DATE_FORMAT(s.delivery_date, '%Y-%m') AS monthValue
+    FROM chassis_master cm
+    INNER JOIN sales_data_combined s
+        ON s.id = cm.sales_data_id
+    WHERE s.delivery_date IS NOT NULL
+    ORDER BY monthValue DESC
+`);
+
+        // const monthNames = [
+        //     "JAN", "FEB", "MAR", "APR",
+        //     "MAY", "JUN", "JUL", "AUG",
+        //     "SEP", "OCT", "NOV", "DEC"
+        // ];
+
+        const deliveryMonths = deliveryMonthRows.map((row) => {
+            const [year, month] = row.monthValue.split("-");
+
+            return {
+                value: row.monthValue,
+                label: `${monthNames[Number(month) - 1]}-${year.slice(-2)}`,
+            };
+        });
+
+
+
         return res.status(200).json({
             success: true,
             records: formattedRecords,
             branches,
             dealerBranches,
             freePaidMonths,
+            segments,
+            deliveryMonths,
             pagination: {
                 total,
                 page,

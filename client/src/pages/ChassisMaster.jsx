@@ -25,6 +25,7 @@ function ChassisMaster() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [selectedChassis, setSelectedChassis] = useState(null);
 
   const [selectedSaleBranch, setSelectedSaleBranch] = useState("");
@@ -38,6 +39,12 @@ function ChassisMaster() {
 
   const [locationFilter, setLocationFilter] = useState("");
 
+  const [selectedSegment, setSelectedSegment] = useState("");
+  const [segments, setSegments] = useState([]);
+
+  const [deliveryMonths, setDeliveryMonths] = useState([]);
+  const [selectedDeliveryMonth, setSelectedDeliveryMonth] = useState("");
+
   // ========================================
   // FETCH CHASSIS MASTER
   // ========================================
@@ -49,6 +56,8 @@ function ChassisMaster() {
     dealerBranchValue = selectedDealerBranch,
     monthValue = selectedFreePaidMonth,
     locationValue = locationFilter,
+    segmentValue = selectedSegment,
+    deliveryMonthValue = selectedDeliveryMonth,
   ) => {
     try {
       setLoading(true);
@@ -63,13 +72,15 @@ function ChassisMaster() {
           dealerBranchValue,
         )}&freePaidMonth=${encodeURIComponent(
           monthValue,
-        )}&locationFilter=${encodeURIComponent(locationValue.trim())}`,
+        )}&locationFilter=${encodeURIComponent(locationValue.trim())}&segment=${encodeURIComponent(segmentValue)}&deliveryMonth=${encodeURIComponent(deliveryMonthValue)}`,
       );
 
       setRecords(response.data.records || []);
       setBranches(response.data.branches || []);
       setDealerBranches(response.data.dealerBranches || []);
       setFreePaidMonths(response.data.freePaidMonths || []);
+      setSegments(response.data.segments || []);
+      setDeliveryMonths(response.data.deliveryMonths || []);
 
       setPagination(
         response.data.pagination || {
@@ -219,7 +230,39 @@ function ChassisMaster() {
               <thead>
                 <tr>
                   <th>Chassis Number</th>
-                  <th>Delivery Date</th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Delivery Date</span>
+
+                      <select
+                        value={selectedDeliveryMonth}
+                        onChange={(e) => {
+                          const value = e.target.value;
+
+                          setSelectedDeliveryMonth(value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                            locationFilter,
+                            selectedSegment,
+                            value,
+                          );
+                        }}
+                      >
+                        <option value="">All Months</option>
+
+                        {deliveryMonths.map((month) => (
+                          <option key={month.value} value={month.value}>
+                            {month.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </th>
                   <th>
                     <div className="rd-kit-sales-master-th-filter">
                       <span>Sale Branch</span>
@@ -301,7 +344,37 @@ function ChassisMaster() {
                     </div>
                   </th>
                   <th>Mobile Number</th>
-                  <th>Segment</th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Segment</span>
+
+                      <select
+                        value={selectedSegment}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedSegment(value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                            locationFilter,
+                            value,
+                          );
+                        }}
+                      >
+                        <option value="">All Segments</option>
+
+                        {segments.map((segment) => (
+                          <option key={segment} value={segment}>
+                            {segment}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </th>
                   <th>Last Free/Paid</th>
                   <th>
                     <div className="rd-kit-sales-master-th-filter">
@@ -354,6 +427,7 @@ function ChassisMaster() {
                         }}
                       >
                         <option value="">All Dealer Branches</option>
+                        <option value="blank">No Dealer Branch</option>
 
                         {dealerBranches.map((branch) => (
                           <option key={branch.id} value={branch.id}>

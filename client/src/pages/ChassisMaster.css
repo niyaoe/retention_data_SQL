@@ -860,3 +860,29 @@
   background: #fff0e9;
   color: #e64a19;
 }
+
+
+
+/* SEGMENT FILTER */
+
+.rd-kit-sales-master .rd-kit-sales-master-th-filter select {
+  width: 100%;
+  min-width: 105px;
+  max-width: 145px;
+  height: 29px;
+  padding: 4px 7px;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  background: #fff;
+  color: #e64a19;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.rd-kit-sales-master .rd-kit-sales-master-th-filter select:focus {
+  border-color: #e64a19;
+  box-shadow: 0 0 0 2px rgba(230, 74, 25, 0.1);
+}
