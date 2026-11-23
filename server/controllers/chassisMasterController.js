@@ -1,11 +1,41 @@
 const { pool } = require("../config/db");
 
 // ========================================
+// CHASSIS MASTER FILTER OPTIONS CACHE
+// ========================================
+
+const FILTER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+const filterOptionsCache = new Map();
+
+const getCachedFilterQuery = async (key, sql) => {
+    const cached = filterOptionsCache.get(key);
+
+    // Return cached data if still valid
+    if (cached && cached.expiresAt > Date.now()) {
+        return cached.rows;
+    }
+
+    // Fetch fresh data from MySQL
+    const [rows] = await pool.query(sql);
+
+    // Store in cache
+    filterOptionsCache.set(key, {
+        rows,
+        expiresAt: Date.now() + FILTER_CACHE_TTL,
+    });
+
+    return rows;
+};
+
+// ========================================
 // GET CHASSIS MASTER LIST
 // ========================================
 
 const getChassisMaster = async (req, res) => {
     try {
+
+        const controllerStartedAt = Date.now();
         const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
 
         const limit = Math.min(
@@ -29,15 +59,26 @@ const getChassisMaster = async (req, res) => {
         const conditions = [];
         const searchParams = [];
 
-        const [monthRows] = await pool.query(`
-    SELECT DISTINCT
-        DATE_FORMAT(css.latest_free_paid_bill_date, '%Y-%m') AS monthValue
-    FROM chassis_service_summary css
-    INNER JOIN chassis_master cm
-        ON cm.chassis_no = css.chassis_number
-    WHERE css.latest_free_paid_bill_date IS NOT NULL
-    ORDER BY monthValue DESC
-`);
+
+
+        const monthQueryStartedAt = Date.now();
+
+        const monthRows = await getCachedFilterQuery(
+            "freePaidMonths",
+            `
+        SELECT DISTINCT
+            DATE_FORMAT(css.latest_free_paid_bill_date, '%Y-%m') AS monthValue
+        FROM chassis_service_summary css
+        INNER JOIN chassis_master cm
+            ON cm.chassis_no = css.chassis_number
+        WHERE css.latest_free_paid_bill_date IS NOT NULL
+        ORDER BY monthValue DESC
+    `
+        );
+
+        console.log(
+            `[Chassis Master] Free/Paid months query: ${Date.now() - monthQueryStartedAt} ms`
+        );
 
         const monthNames = [
             "JAN",
@@ -214,38 +255,77 @@ const getChassisMaster = async (req, res) => {
             ? `WHERE ${conditions.join(" AND ")}`
             : "";
 
+
         const countStartedAt = Date.now();
 
-        // 1. Total matching chassis
+        // Build only the JOINs required by active filters
+        const countJoins = [];
+
+        const needsSalesJoin = Boolean(
+            segmentFilter ||
+            locationFilter ||
+            search ||
+            saleBranch ||
+            deliveryMonth
+        );
+
+        const needsCssJoin = Boolean(
+            segmentFilter ||
+            dealerBranchId ||
+            freePaidMonth
+        );
+
+        if (needsSalesJoin) {
+            countJoins.push(`
+        LEFT JOIN sales_data_combined s
+            ON s.id = cm.sales_data_id
+    `);
+        }
+
+        if (locationFilter) {
+            countJoins.push(`
+        LEFT JOIN pincode_lookup_summary pin_filter_details
+            ON pin_filter_details.pincode = TRIM(s.postal_code)
+    `);
+        }
+
+        if (needsCssJoin) {
+            countJoins.push(`
+        LEFT JOIN chassis_service_summary css
+            ON css.chassis_number = cm.chassis_no
+    `);
+        }
+
+        if (segmentFilter) {
+            countJoins.push(`
+        LEFT JOIN ro_master_combined segment_service
+            ON segment_service.id = css.latest_service_id
+    `);
+        }
+
         const [countResult] = await pool.query(
             `
         SELECT COUNT(*) AS total
         FROM chassis_master cm
-
-        LEFT JOIN sales_data_combined s
-    ON s.id = cm.sales_data_id
-
-${locationFilter ? `
-LEFT JOIN pincode_lookup_summary pin_filter_details
-    ON pin_filter_details.pincode = TRIM(s.postal_code)
-` : ""}
-
-LEFT JOIN chassis_service_summary css
-    ON css.chassis_number = cm.chassis_no
-
-    LEFT JOIN ro_master_combined segment_service
-    ON segment_service.id = css.latest_service_id
-
+        ${countJoins.join("\n")}
         ${whereClause}
     `,
-            searchParams,
+            searchParams
         );
 
         console.log(
-            `[Chassis Master] Count query: ${Date.now() - countStartedAt} ms`,
+            `[Chassis Master] Count query: ${Date.now() - countStartedAt} ms`
         );
 
         const total = Number(countResult[0].total);
+
+
+        // 1. Total matching chassis
+
+
+       
+
+
 
         const recordsStartedAt = Date.now();
 
@@ -328,8 +408,10 @@ LEFT JOIN pincode_lookup_summary pin_filter_details
 LEFT JOIN chassis_service_summary css
     ON css.chassis_number = cm.chassis_no
 
+    ${segmentFilter ? `
     LEFT JOIN ro_master_combined segment_service
-    ON segment_service.id = css.latest_service_id
+        ON segment_service.id = css.latest_service_id
+` : ""}
 
         ${whereClause}
 
@@ -410,69 +492,104 @@ LEFT JOIN chassis_service_summary css
             };
         });
 
-        console.log(
-            `[Chassis Master] Total controller time: ${Date.now() - countStartedAt} ms`,
-        );
+
 
         // Only branches that have sales-linked chassis records
-        const [branchRows] = await pool.query(`
-    SELECT DISTINCT s.sale_branch
-    FROM chassis_master cm
-    INNER JOIN sales_data_combined s
-        ON s.id = cm.sales_data_id
-    WHERE s.sale_branch IS NOT NULL
-      AND TRIM(s.sale_branch) <> ''
-    ORDER BY s.sale_branch
-`);
+        const branchQueryStartedAt = Date.now();
+
+        const branchRows = await getCachedFilterQuery(
+            "saleBranches",
+            `
+        SELECT DISTINCT s.sale_branch
+        FROM chassis_master cm
+        INNER JOIN sales_data_combined s
+            ON s.id = cm.sales_data_id
+        WHERE s.sale_branch IS NOT NULL
+          AND TRIM(s.sale_branch) <> ''
+        ORDER BY s.sale_branch
+    `
+        );
+
+        console.log(
+            `[Chassis Master] Sale branches query: ${Date.now() - branchQueryStartedAt} ms`
+        );
 
         const branches = branchRows.map((row) => row.sale_branch);
 
-        const [dealerBranchRows] = await pool.query(`
-    SELECT id, branch_name
-    FROM branch_master
-    WHERE is_active = 1
-      AND branch_name IS NOT NULL
-      AND TRIM(branch_name) <> ''
-    ORDER BY branch_name
-`);
+        const dealerBranchQueryStartedAt = Date.now();
 
+        const dealerBranchRows = await getCachedFilterQuery(
+            "dealerBranches",
+            `
+        SELECT id, branch_name
+        FROM branch_master
+        WHERE is_active = 1
+          AND branch_name IS NOT NULL
+          AND TRIM(branch_name) <> ''
+        ORDER BY branch_name
+    `
+        );
+
+        console.log(
+            `[Chassis Master] Dealer branches query: ${Date.now() - dealerBranchQueryStartedAt} ms`
+        );
         const dealerBranches = dealerBranchRows.map((row) => ({
             id: row.id,
             branchName: row.branch_name,
         }));
 
-        const [segmentRows] = await pool.query(`
-    SELECT DISTINCT resolved.segment
-    FROM (
-        SELECT
-            COALESCE(
-                NULLIF(TRIM(s.segment), ''),
-                NULLIF(TRIM(rs.segment), '')
-            ) AS segment
+        const queryStartedAt = Date.now();
+
+        const segmentRows = await getCachedFilterQuery(
+            "segments",
+            `
+        SELECT DISTINCT resolved.segment
+        FROM (
+            SELECT
+                COALESCE(
+                    NULLIF(TRIM(s.segment), ''),
+                    NULLIF(TRIM(rs.segment), '')
+                ) AS segment
+            FROM chassis_master cm
+            LEFT JOIN sales_data_combined s
+                ON s.id = cm.sales_data_id
+            LEFT JOIN chassis_service_summary css
+                ON css.chassis_number = cm.chassis_no
+            LEFT JOIN ro_master_combined rs
+                ON rs.id = css.latest_service_id
+        ) AS resolved
+        WHERE resolved.segment IS NOT NULL
+          AND resolved.segment <> ''
+        ORDER BY resolved.segment
+    `
+        );
+
+        const segments = segmentRows.map((row) => row.segment);
+
+        console.log(
+            `[Chassis Master] segment query: ${Date.now() - queryStartedAt} ms`
+        );
+
+
+
+        const deliveryMonthQueryStartedAt = Date.now();
+
+        const deliveryMonthRows = await getCachedFilterQuery(
+            "deliveryMonths",
+            `
+        SELECT DISTINCT
+            DATE_FORMAT(s.delivery_date, '%Y-%m') AS monthValue
         FROM chassis_master cm
-        LEFT JOIN sales_data_combined s
+        INNER JOIN sales_data_combined s
             ON s.id = cm.sales_data_id
-        LEFT JOIN chassis_service_summary css
-            ON css.chassis_number = cm.chassis_no
-        LEFT JOIN ro_master_combined rs
-            ON rs.id = css.latest_service_id
-    ) AS resolved
-    WHERE resolved.segment IS NOT NULL
-      AND resolved.segment <> ''
-    ORDER BY resolved.segment
-`);
+        WHERE s.delivery_date IS NOT NULL
+        ORDER BY monthValue DESC
+    `
+        );
 
-        const segments = segmentRows.map(row => row.segment);
-
-        const [deliveryMonthRows] = await pool.query(`
-    SELECT DISTINCT
-        DATE_FORMAT(s.delivery_date, '%Y-%m') AS monthValue
-    FROM chassis_master cm
-    INNER JOIN sales_data_combined s
-        ON s.id = cm.sales_data_id
-    WHERE s.delivery_date IS NOT NULL
-    ORDER BY monthValue DESC
-`);
+        console.log(
+            `[Chassis Master] Delivery months query: ${Date.now() - deliveryMonthQueryStartedAt} ms`
+        );
 
         // const monthNames = [
         //     "JAN", "FEB", "MAR", "APR",
@@ -489,6 +606,10 @@ LEFT JOIN chassis_service_summary css
             };
         });
 
+        console.log(
+            `[Chassis Master] Total API time: ${Date.now() - controllerStartedAt
+            } ms`
+        );
 
 
         return res.status(200).json({
