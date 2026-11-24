@@ -1,3 +1,4 @@
+
 import { Link, useOutletContext } from "react-router-dom";
 import {
   FiDatabase,
@@ -32,18 +33,10 @@ function Dashboard() {
       code: "02",
     },
     {
-      title: "DMS Retail",
-      description: "Retail customer and vehicle records",
-      icon: <FiDatabase />,
-      path: "/dms-retail",
-      roles: ["admin", "user"],
-      code: "06",
-    },
-    {
-      title: "Sales Master",
-      description: "Combined sales and service",
+      title: "Chassis Master",
+      description: "Combined chassis and service records",
       icon: <FiLayers />,
-      path: "/sales-master",
+      path: "/chassis-master",
       roles: ["admin", "user"],
       code: "03",
     },
@@ -63,10 +56,18 @@ function Dashboard() {
       roles: ["admin"],
       code: "05",
     },
+    {
+      title: "DMS Retail",
+      description: "Retail customer and vehicle records",
+      icon: <FiDatabase />,
+      path: "/dms-retail",
+      roles: ["admin", "user"],
+      code: "06",
+    },
   ];
 
   const visibleSections = sections.filter((section) =>
-    section.roles.includes(user?.role),
+    section.roles.includes(user?.role)
   );
 
   return (
@@ -74,14 +75,18 @@ function Dashboard() {
       {/* Welcome Header */}
       <section className="rd-kitkat-dashboard-welcome">
         <div className="rd-kitkat-dashboard-welcome-main">
-          <span className="rd-kitkat-dashboard-kicker">RETENTION DATA</span>
+          <span className="rd-kitkat-dashboard-kicker">
+            RETENTION DATA
+          </span>
 
           <h2>{user?.name || "Dashboard"}</h2>
 
           <div className="rd-kitkat-dashboard-user-meta">
             <span>{user?.role?.toUpperCase()} ACCESS</span>
             <span className="rd-kitkat-dashboard-meta-dot" />
-            <span>{user?.branch?.branchName || "ALL BRANCHES"}</span>
+            <span>
+              {user?.branch?.branchName || "ALL BRANCHES"}
+            </span>
           </div>
         </div>
 
