@@ -323,7 +323,7 @@ const getChassisMaster = async (req, res) => {
         // 1. Total matching chassis
 
 
-       
+
 
 
 
@@ -393,7 +393,8 @@ COALESCE(
             s.segment,
 
             css.latest_service_id,
-            css.latest_free_paid_id
+css.latest_free_paid_id,
+latest_sort.bill_date AS latest_service_sort_date
 
         FROM chassis_master cm
 
@@ -408,6 +409,9 @@ LEFT JOIN pincode_lookup_summary pin_filter_details
 LEFT JOIN chassis_service_summary css
     ON css.chassis_number = cm.chassis_no
 
+    LEFT JOIN ro_master_combined latest_sort
+    ON latest_sort.id = css.latest_service_id
+
     ${segmentFilter ? `
     LEFT JOIN ro_master_combined segment_service
         ON segment_service.id = css.latest_service_id
@@ -415,8 +419,11 @@ LEFT JOIN chassis_service_summary css
 
         ${whereClause}
 
-        ORDER BY cm.id DESC
-        LIMIT ? OFFSET ?
+        ORDER BY
+    latest_sort.bill_date DESC,
+    latest_sort.id DESC,
+    cm.id DESC
+LIMIT ? OFFSET ?
 
     ) AS base
 
@@ -432,7 +439,10 @@ LEFT JOIN chassis_service_summary css
     LEFT JOIN pincode_lookup_summary pin_details
     ON pin_details.pincode = TRIM(base.postal_code)
 
-    ORDER BY base.id DESC
+    ORDER BY
+    base.latest_service_sort_date DESC,
+    base.latest_service_id DESC,
+    base.id DESC
     `,
             [...searchParams, limit, offset],
         );

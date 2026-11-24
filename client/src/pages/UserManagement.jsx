@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import {
   FiUsers,
@@ -12,7 +11,7 @@ import {
   FiMapPin,
   FiShield,
   FiCheckCircle,
-  FiAlertCircle
+  FiAlertCircle,
 } from "react-icons/fi";
 
 import api from "../services/api";
@@ -22,7 +21,7 @@ const emptyForm = {
   name: "",
   email: "",
   password: "",
-  branchId: ""
+  branchId: "",
 };
 
 function UserManagement() {
@@ -48,15 +47,14 @@ function UserManagement() {
     try {
       const [userRes, branchRes] = await Promise.all([
         api.get("/users"),
-        api.get("/branches")
+        api.get("/branches"),
       ]);
 
       setUsers(userRes.data.users || []);
       setBranches(branchRes.data.branches || []);
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-        "Unable to load user management data."
+        err.response?.data?.message || "Unable to load user management data.",
       );
     } finally {
       setLoading(false);
@@ -83,12 +81,10 @@ function UserManagement() {
     });
   }, [users, search, statusFilter]);
 
-  const activeCount = users.filter(
-    (user) => user.status === "active"
-  ).length;
+  const activeCount = users.filter((user) => user.status === "active").length;
 
   const inactiveCount = users.filter(
-    (user) => user.status === "inactive"
+    (user) => user.status === "inactive",
   ).length;
 
   const openCreateModal = () => {
@@ -105,7 +101,7 @@ function UserManagement() {
       name: user.name || "",
       email: user.email || "",
       password: "",
-      branchId: user.branchId?._id || user.branchId || ""
+      branchId: user.branchId?._id || user.branchId || "",
     });
 
     setError("");
@@ -125,7 +121,7 @@ function UserManagement() {
 
     setForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -140,7 +136,8 @@ function UserManagement() {
         const payload = {
           name: form.name.trim(),
           email: form.email.trim(),
-          branchId: form.branchId
+          branchId: form.branchId,
+          ...(form.password.trim() ? { password: form.password } : {}),
         };
 
         await api.put(`/users/${editingUser._id}`, payload);
@@ -150,7 +147,7 @@ function UserManagement() {
           name: form.name.trim(),
           email: form.email.trim(),
           password: form.password,
-          branchId: form.branchId
+          branchId: form.branchId,
         };
 
         await api.post("/users", payload);
@@ -163,21 +160,17 @@ function UserManagement() {
       setEditingUser(null);
       setForm(emptyForm);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Unable to save user details."
-      );
+      setError(err.response?.data?.message || "Unable to save user details.");
     } finally {
       setSaving(false);
     }
   };
 
   const toggleStatus = async (user) => {
-    const nextStatus =
-      user.status === "active" ? "inactive" : "active";
+    const nextStatus = user.status === "active" ? "inactive" : "active";
 
     const confirmed = window.confirm(
-      `${nextStatus === "active" ? "Activate" : "Deactivate"} ${user.name}?`
+      `${nextStatus === "active" ? "Activate" : "Deactivate"} ${user.name}?`,
     );
 
     if (!confirmed) return;
@@ -187,19 +180,16 @@ function UserManagement() {
 
     try {
       await api.patch(`/users/${user._id}/status`, {
-        status: nextStatus
+        status: nextStatus,
       });
 
       setSuccess(
-        `${user.name} ${nextStatus === "active" ? "activated" : "deactivated"}.`
+        `${user.name} ${nextStatus === "active" ? "activated" : "deactivated"}.`,
       );
 
       await loadData();
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Unable to update user status."
-      );
+      setError(err.response?.data?.message || "Unable to update user status.");
     }
   };
 
@@ -235,7 +225,7 @@ function UserManagement() {
         </div>
       </div>
 
-      {(error && !showModal) && (
+      {error && !showModal && (
         <div className="rd-kit-users-alert rd-kit-users-alert-error">
           <FiAlertCircle />
           <span>{error}</span>
@@ -365,9 +355,7 @@ function UserManagement() {
             ) : (
               filteredUsers.map((user, index) => (
                 <tr key={user._id}>
-                  <td className="rd-kit-users-number">
-                    {index + 1}
-                  </td>
+                  <td className="rd-kit-users-number">{index + 1}</td>
 
                   <td>
                     <div className="rd-kit-users-person">
@@ -508,21 +496,31 @@ function UserManagement() {
                   />
                 </div>
 
-                {!editingUser && (
-                  <div className="rd-kit-users-field">
-                    <label htmlFor="rd-user-password">Password</label>
-                    <input
-                      id="rd-user-password"
-                      type="password"
-                      name="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      placeholder="Enter password"
-                      minLength="6"
-                      required
-                    />
-                  </div>
-                )}
+                <div className="rd-kit-users-field">
+                  <label htmlFor="rd-user-password">
+                    {editingUser ? "New Password (Optional)" : "Password"}
+                  </label>
+
+                  <input
+                    id="rd-user-password"
+                    type="password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder={
+                      editingUser
+                        ? "Enter new password to change"
+                        : "Enter password"
+                    }
+                    minLength="8"
+                    required={!editingUser}
+                    autoComplete="new-password"
+                  />
+
+                  {editingUser && (
+                    <small>Leave blank to keep the existing password.</small>
+                  )}
+                </div>
 
                 <div className="rd-kit-users-field">
                   <label htmlFor="rd-user-branch">Assign Branch</label>
