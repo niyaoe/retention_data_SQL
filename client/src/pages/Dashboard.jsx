@@ -1,4 +1,3 @@
-
 import { Link, useOutletContext } from "react-router-dom";
 import {
   FiDatabase,
@@ -64,10 +63,18 @@ function Dashboard() {
       roles: ["admin", "user"],
       code: "06",
     },
+    {
+      title: "Service Action",
+      description: "Pending service action records",
+      icon: <FiTool />,
+      path: "/service-action",
+      roles: ["admin", "user"],
+      code: "07",
+    },
   ];
 
   const visibleSections = sections.filter((section) =>
-    section.roles.includes(user?.role)
+    section.roles.includes(user?.role),
   );
 
   return (
@@ -75,18 +82,14 @@ function Dashboard() {
       {/* Welcome Header */}
       <section className="rd-kitkat-dashboard-welcome">
         <div className="rd-kitkat-dashboard-welcome-main">
-          <span className="rd-kitkat-dashboard-kicker">
-            RETENTION DATA
-          </span>
+          <span className="rd-kitkat-dashboard-kicker">RETENTION DATA</span>
 
           <h2>{user?.name || "Dashboard"}</h2>
 
           <div className="rd-kitkat-dashboard-user-meta">
             <span>{user?.role?.toUpperCase()} ACCESS</span>
             <span className="rd-kitkat-dashboard-meta-dot" />
-            <span>
-              {user?.branch?.branchName || "ALL BRANCHES"}
-            </span>
+            <span>{user?.branch?.branchName || "ALL BRANCHES"}</span>
           </div>
         </div>
 

@@ -1,0 +1,825 @@
+
+/* ==========================================
+   SERVICE ACTION
+   Android 4.4.4 KitKat Theme
+   Unique CSS: rd-kit-service-action-
+========================================== */
+
+.rd-kit-service-action {
+  --rssa-orange: #ff5722;
+  --rssa-orange-dark: #e64a19;
+  --rssa-card: #ffffff;
+  --rssa-text: #303030;
+  --rssa-muted: #777777;
+  --rssa-border: #dedede;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
+
+  color: var(--rssa-text);
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.rd-kit-service-action *,
+.rd-kit-service-action *::before,
+.rd-kit-service-action *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-header {
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-title {
+  min-width: 0;
+}
+
+.rd-kit-service-action .rd-kit-service-action-breadcrumb {
+  color: var(--rssa-orange);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-title h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: #292929;
+}
+
+.rd-kit-service-action .rd-kit-service-action-title p {
+  margin: 5px 0 0;
+  color: var(--rssa-muted);
+  font-size: 12px;
+}
+
+/* ==========================================
+   HEADER COUNTS
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+  min-width: 0;
+}
+
+.rd-kit-service-action .rd-kit-service-action-counts {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-counts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 13px;
+  border-left: 1px solid var(--rssa-border);
+}
+
+.rd-kit-service-action .rd-kit-service-action-counts span {
+  color: #888;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rd-kit-service-action .rd-kit-service-action-counts strong {
+  color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   REFRESH
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-refresh {
+  min-height: 36px;
+  padding: 8px 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: none;
+  border-radius: 3px;
+  background: var(--rssa-orange);
+  color: white;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rd-kit-service-action .rd-kit-service-action-refresh:hover:not(:disabled) {
+  background: var(--rssa-orange-dark);
+}
+
+.rd-kit-service-action .rd-kit-service-action-refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   IMPORT PANEL
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-import {
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  padding: 12px 15px;
+
+  background: #fff;
+  border: 1px solid var(--rssa-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-info {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  background: var(--rssa-orange);
+  border-radius: 3px;
+  font-size: 17px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-info h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-info p {
+  margin: 5px 0 0;
+  color: var(--rssa-muted);
+  font-size: 10px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-controls input {
+  max-width: 250px;
+  min-width: 0;
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-button {
+  min-height: 36px;
+  padding: 8px 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: none;
+  border-radius: 3px;
+  background: var(--rssa-orange);
+  color: #fff;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-button:hover:not(:disabled) {
+  background: var(--rssa-orange-dark);
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   IMPORT ALERTS
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-alert {
+  flex-shrink: 0;
+  padding: 10px 13px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-alert-error {
+  color: #b71c1c;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+}
+
+.rd-kit-service-action .rd-kit-service-action-alert-success {
+  color: #276738;
+  background: #eaf5ec;
+  border: 1px solid #c8e6c9;
+}
+
+.rd-kit-service-action .rd-kit-service-action-import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 18px;
+  margin-top: 8px;
+}
+
+/* ==========================================
+   TABLE CARD
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-card {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  background: var(--rssa-card);
+  border: 1px solid var(--rssa-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+/* CARD HEADER */
+
+.rd-kit-service-action .rd-kit-service-action-card-heading {
+  flex-shrink: 0;
+  min-height: 62px;
+  padding: 12px 15px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.rd-kit-service-action .rd-kit-service-action-card-heading h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rd-kit-service-action .rd-kit-service-action-card-heading h3 svg {
+  color: var(--rssa-orange);
+  font-size: 17px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-card-heading p {
+  margin: 5px 0 0;
+  color: #888;
+  font-size: 11px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-record-count {
+  padding: 6px 9px;
+  border-radius: 3px;
+
+  background: #fff0e9;
+  color: var(--rssa-orange-dark);
+
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   SEARCH
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-search {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 8px 13px;
+  border-bottom: 1px solid #eee;
+  color: #888;
+}
+
+.rd-kit-service-action .rd-kit-service-action-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 4px;
+
+  border: none;
+  outline: none;
+
+  color: #333;
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-search button {
+  padding: 7px 13px;
+
+  border: none;
+  border-radius: 3px;
+  background: var(--rssa-orange);
+  color: #fff;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rd-kit-service-action .rd-kit-service-action-search button:hover {
+  background: var(--rssa-orange-dark);
+}
+
+/* ==========================================
+   TABLE SCROLL
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-table-scroll {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: none;
+
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* TABLE */
+
+.rd-kit-service-action .rd-kit-service-action-table {
+  width: 100%;
+  min-width: 2200px;
+  border-collapse: collapse;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  padding: 11px 12px;
+
+  background: #eee;
+  color: #444;
+
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+
+  border-bottom: 1px solid #d5d5d5;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table td {
+  max-width: 260px;
+  padding: 10px 12px;
+
+  color: #555;
+  border-bottom: 1px solid #eee;
+
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table tbody tr:hover {
+  background: #fff3ed;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table td:first-child {
+  color: #999;
+  font-size: 10px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table td.rd-kit-service-action-chassis {
+  color: #303030;
+  font-weight: 700;
+}
+
+.rd-kit-service-action .rd-kit-service-action-table td.rd-kit-service-action-empty {
+  padding: 35px 15px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-message {
+  min-height: 200px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: #777;
+  font-size: 12px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-message svg {
+  color: var(--rssa-orange);
+}
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-error {
+  min-height: 150px;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  color: #c62828;
+  font-size: 12px;
+  text-align: center;
+}
+
+.rd-kit-service-action .rd-kit-service-action-error button {
+  padding: 7px 15px;
+  border: none;
+  border-radius: 3px;
+  background: var(--rssa-orange);
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-pagination {
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 2px 0;
+  margin-top: 3px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-pagination > span {
+  color: #777;
+  font-size: 11px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rd-kit-service-action .rd-kit-service-action-pagination-buttons button {
+  min-height: 34px;
+  padding: 7px 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  border: 1px solid var(--rssa-border);
+  border-radius: 3px;
+
+  background: white;
+  color: #555;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rd-kit-service-action
+.rd-kit-service-action-pagination-buttons
+button:hover:not(:disabled) {
+  border-color: var(--rssa-orange);
+  color: var(--rssa-orange);
+}
+
+.rd-kit-service-action
+.rd-kit-service-action-pagination-buttons
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   SPINNER
+========================================== */
+
+.rd-kit-service-action .rd-kit-service-action-spin {
+  animation: rssa-spin 0.7s linear infinite;
+}
+
+@keyframes rssa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+  .rd-kit-service-action {
+    padding: 13px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-header {
+    align-items: flex-start;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-header-right {
+    flex-wrap: wrap;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts {
+    gap: 10px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-controls {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .rd-kit-service-action {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-header-right {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts > div {
+    padding-left: 8px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts strong {
+    font-size: 14px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-title h2 {
+    font-size: 19px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-controls input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-button {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-table-scroll {
+    max-height: none;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-pagination {
+    flex-shrink: 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-pagination-buttons {
+    width: 100%;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-pagination-buttons button {
+    flex: 1;
+    min-height: 40px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-summary {
+    gap: 6px 12px;
+  }
+}
+
+/* ==========================================
+   SMALL ANDROID PHONES
+========================================== */
+
+@media (max-width: 420px) {
+  .rd-kit-service-action {
+    padding: 8px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-title h2 {
+    font-size: 17px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-title p {
+    font-size: 11px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-header-right {
+    gap: 8px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts {
+    gap: 6px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts > div {
+    padding-left: 6px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts span {
+    font-size: 9px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts strong {
+    font-size: 12px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-refresh {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import {
+    padding: 10px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-info h3 {
+    font-size: 12px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-import-info p {
+    font-size: 9px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-card-heading {
+    padding: 11px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-card-heading h3 {
+    font-size: 13px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-card-heading p {
+    font-size: 10px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-record-count {
+    font-size: 9px;
+    padding: 5px 6px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-search {
+    padding: 8px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-search button {
+    padding: 7px 9px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-pagination > span {
+    font-size: 10px;
+  }
+}
+
+/* ==========================================
+   VERY SMALL SCREENS
+========================================== */
+
+@media (max-width: 360px) {
+  .rd-kit-service-action {
+    padding: 6px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts {
+    gap: 4px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-counts strong {
+    font-size: 11px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-refresh {
+    padding: 6px 7px;
+  }
+
+  .rd-kit-service-action .rd-kit-service-action-card-heading {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-kit-service-action .rd-kit-service-action-spin {
+    animation: none;
+  }
+}

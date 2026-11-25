@@ -31,6 +31,7 @@ const {
 const {
   startDmsRetailAutoSync,
 } = require("./services/dmsRetailAutoSyncService");
+const serviceActionRoutes = require("./routes/serviceActionRoutes");
 
 const app = express();
 
@@ -62,6 +63,7 @@ app.use("/api/sales-api-sync", salesApiSyncRoutes);
 app.use("/api/service-excel", serviceExcelRoutes);
 app.use("/api/dms-retail", dmsRetailRoutes);
 app.use("/api/service-api-sync", serviceApiSyncRoutes);
+app.use("/api/service-action", serviceActionRoutes);
 
 
 const PORT = process.env.PORT || 5000;

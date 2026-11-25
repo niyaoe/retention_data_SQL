@@ -15,6 +15,8 @@ import SalesExcelImport from "./pages/SalesExcelImport";
 import ModelManagement from "./pages/ModelManagement";
 import ServiceExcelImport from "./pages/ServiceExcelImport";
 import DmsRetail from "./pages/DmsRetail";
+import ServiceAction from "./pages/ServiceAction";
+import ServiceActionExcelImport from "./pages/ServiceActionExcelImport";
 
 function AdminOnly({ children }) {
   const { user } = useOutletContext();
@@ -62,6 +64,8 @@ function App() {
 
           <Route path="/dms-retail" element={<DmsRetail />} />
 
+          <Route path="service-action" element={<ServiceAction />} />
+
           <Route
             path="/sales-import"
             element={
@@ -75,6 +79,15 @@ function App() {
             element={
               <AdminOnly>
                 <ServiceExcelImport />
+              </AdminOnly>
+            }
+          />
+
+          <Route
+            path="service-action-import"
+            element={
+              <AdminOnly>
+                <ServiceActionExcelImport />
               </AdminOnly>
             }
           />

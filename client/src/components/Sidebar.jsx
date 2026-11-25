@@ -30,6 +30,12 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
       icon: <FiTool />,
       roles: ["admin", "user"],
     },
+     {
+      title: "Service Action",
+      path: "/service-action",
+      icon: <FiTool />,
+      roles: ["admin", "user"],
+    },
     {
       title: "DMS Retail",
       icon: <FiDatabase />,
@@ -51,6 +57,12 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
     {
       title: "Service Excel Import",
       path: "/service-import",
+      icon: <FiFile />,
+      roles: ["admin"],
+    },
+    {
+      title: "Service Action Import",
+      path: "/service-action-import",
       icon: <FiFile />,
       roles: ["admin"],
     },
