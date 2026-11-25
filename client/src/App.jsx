@@ -17,6 +17,7 @@ import ServiceExcelImport from "./pages/ServiceExcelImport";
 import DmsRetail from "./pages/DmsRetail";
 import ServiceAction from "./pages/ServiceAction";
 import ServiceActionExcelImport from "./pages/ServiceActionExcelImport";
+import CaseStatusManagement from "./pages/CaseStatusManagement";
 
 function AdminOnly({ children }) {
   const { user } = useOutletContext();
@@ -88,6 +89,14 @@ function App() {
             element={
               <AdminOnly>
                 <ServiceActionExcelImport />
+              </AdminOnly>
+            }
+          />
+          <Route
+            path="/case-status-management"
+            element={
+              <AdminOnly>
+                <CaseStatusManagement />
               </AdminOnly>
             }
           />

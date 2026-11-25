@@ -560,3 +560,345 @@
     font-size: 10px;
   }
 }
+
+
+
+
+/* =========================================
+   CHASSIS MODAL TABS
+========================================= */
+
+.rd-k44-tabs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  margin-bottom: 12px;
+  background: var(--bs-body-bg, #ffffff);
+  border: 1px solid var(--bs-border-color, #e8e8e8);
+  border-radius: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.rd-k44-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.rd-k44-tabs button {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 15px;
+  flex: 1;
+  white-space: nowrap;
+  color: var(--bs-secondary-color, #777);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rd-k44-tabs button svg {
+  font-size: 14px;
+}
+
+.rd-k44-tabs button:hover {
+  color: #e64a19;
+  background: rgba(230, 74, 25, 0.06);
+}
+
+.rd-k44-tabs button.active {
+  color: #ffffff;
+  background: #e64a19;
+  border-color: #e64a19;
+}
+
+@media (max-width: 500px) {
+  .rd-k44-tabs {
+    gap: 3px;
+  }
+
+  .rd-k44-tabs button {
+    min-width: 105px;
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+}
+
+
+
+/* call section  */
+
+
+/* =========================================
+   CALL SECTION FORM
+========================================= */
+
+.rd-k44-call-form {
+  width: 100%;
+}
+
+.rd-k44-call-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rd-k44-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rd-k44-field label {
+  color: var(--bs-secondary-color, #777);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rd-k44-field input,
+.rd-k44-field select,
+.rd-k44-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  color: var(--bs-body-color, #333);
+  background: var(--bs-body-bg, #fff);
+  border: 1px solid var(--bs-border-color, #ddd);
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  font-size: 12px;
+  transition: 0.2s ease;
+}
+
+.rd-k44-field input,
+.rd-k44-field select {
+  height: 38px;
+}
+
+.rd-k44-field textarea {
+  min-height: 75px;
+  resize: vertical;
+}
+
+.rd-k44-field input:focus,
+.rd-k44-field select:focus,
+.rd-k44-field textarea:focus {
+  border-color: #e64a19;
+  box-shadow: 0 0 0 2px rgba(230, 74, 25, 0.1);
+}
+
+.rd-k44-field select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.rd-k44-voice-field {
+  grid-column: 1 / -1;
+}
+
+/* SAVE ACTIONS */
+
+.rd-k44-call-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bs-border-color, #eee);
+}
+
+.rd-k44-call-actions > span {
+  color: var(--bs-secondary-color, #888);
+  font-size: 10px;
+}
+
+.rd-k44-call-actions button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 15px;
+  color: #fff;
+  background: #e64a19;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rd-k44-call-actions button:hover {
+  background: #c93b10;
+}
+
+.rd-k44-call-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ALERTS */
+
+.rd-k44-call-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 9px 11px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.rd-k44-call-alert.error {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.08);
+  border: 1px solid rgba(220, 53, 69, 0.18);
+}
+
+.rd-k44-call-alert.success {
+  color: #198754;
+  background: rgba(25, 135, 84, 0.08);
+  border: 1px solid rgba(25, 135, 84, 0.18);
+}
+
+/* =========================================
+   CALL HISTORY TABLE
+========================================= */
+
+.rd-k44-call-history-section {
+  padding-bottom: 10px;
+}
+
+.rd-k44-history-table {
+  width: 100%;
+  min-width: 1250px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 11px;
+}
+
+.rd-k44-history-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px;
+  color: #fff;
+  background: #30343b;
+  border-bottom: 2px solid #e64a19;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.rd-k44-history-table td {
+  padding: 10px;
+  color: var(--bs-body-color, #444);
+  border-bottom: 1px solid var(--bs-border-color, #ededed);
+  vertical-align: middle;
+}
+
+.rd-k44-history-table tbody tr {
+  background: var(--bs-body-bg, #fff);
+}
+
+.rd-k44-history-table tbody tr:nth-child(even) {
+  background: var(--bs-tertiary-bg, #fafafa);
+}
+
+.rd-k44-history-table tbody tr:hover {
+  background: rgba(230, 74, 25, 0.05);
+}
+
+.rd-k44-history-user {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rd-k44-history-change {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 220px;
+}
+
+.rd-k44-history-change .old {
+  color: var(--bs-secondary-color, #999);
+  text-decoration: line-through;
+}
+
+.rd-k44-history-change .arrow {
+  color: #e64a19;
+}
+
+.rd-k44-history-change strong {
+  color: #e64a19;
+  font-weight: 700;
+}
+
+.rd-k44-history-voice {
+  min-width: 180px;
+  max-width: 260px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.rd-k44-changed-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.rd-k44-changed-tags span {
+  display: inline-block;
+  padding: 3px 6px;
+  color: #e64a19;
+  background: rgba(230, 74, 25, 0.09);
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =========================================
+   CALL SECTION RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+  .rd-k44-call-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .rd-k44-call-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .rd-k44-voice-field {
+    grid-column: auto;
+  }
+
+  .rd-k44-call-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rd-k44-call-actions button {
+    width: 100%;
+  }
+}
