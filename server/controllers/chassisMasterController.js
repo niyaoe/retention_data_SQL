@@ -56,6 +56,32 @@ const getChassisMaster = async (req, res) => {
         const segmentFilter = String(req.query.segment || "").trim();
         const deliveryMonth = String(req.query.deliveryMonth || "").trim();
 
+        const callStatusFilter = String(req.query.callStatus || "").trim();
+
+        const allowedCallStatuses = ["Closed", "Complaint", "Follow-up"];
+
+        if (
+            callStatusFilter &&
+            !allowedCallStatuses.includes(callStatusFilter)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid call status",
+            });
+        }
+        const caseStatusId = String(req.query.caseStatusId || "").trim();
+        const caseSubstatusId = String(req.query.caseSubstatusId || "").trim();
+
+        if (
+            (caseStatusId && !/^\d+$/.test(caseStatusId)) ||
+            (caseSubstatusId && !/^\d+$/.test(caseSubstatusId))
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid case status filter",
+            });
+        }
+
         const conditions = [];
         const searchParams = [];
 
@@ -251,6 +277,45 @@ const getChassisMaster = async (req, res) => {
             searchParams.push(deliveryStart, deliveryEnd);
         }
 
+        if (callStatusFilter) {
+            conditions.push(`
+        EXISTS (
+    SELECT 1
+    FROM chassis_call_cases call_filter
+    WHERE call_filter.chassis_number COLLATE utf8mb4_unicode_ci =
+          cm.chassis_no COLLATE utf8mb4_unicode_ci
+      AND call_filter.call_status = ?
+)
+    `);
+
+            searchParams.push(callStatusFilter);
+        }
+
+        // Case Status + Case Substatus filter
+        if (caseStatusId || caseSubstatusId) {
+            const caseConditions = [];
+
+            if (caseStatusId) {
+                caseConditions.push("case_filter.status_id = ?");
+                searchParams.push(Number(caseStatusId));
+            }
+
+            if (caseSubstatusId) {
+                caseConditions.push("case_filter.substatus_id = ?");
+                searchParams.push(Number(caseSubstatusId));
+            }
+
+            conditions.push(`
+        EXISTS (
+            SELECT 1
+            FROM chassis_call_cases case_filter
+            WHERE case_filter.chassis_number COLLATE utf8mb4_unicode_ci =
+                  cm.chassis_no COLLATE utf8mb4_unicode_ci
+              AND ${caseConditions.join(" AND ")}
+        )
+    `);
+        }
+
         const whereClause = conditions.length
             ? `WHERE ${conditions.join(" AND ")}`
             : "";
@@ -373,7 +438,12 @@ COALESCE(
         last_any_branch.branch_name AS last_service_branch_name_any,
 
         pin_details.places AS pin_places,
-        pin_details.districts AS pin_districts
+pin_details.districts AS pin_districts,
+
+ccs.status_name AS case_status,
+ccsub.substatus_name AS case_substatus,
+cc.call_status AS call_status
+
 
     FROM (
         SELECT
@@ -427,8 +497,18 @@ LIMIT ? OFFSET ?
 
     ) AS base
 
-    LEFT JOIN ro_master_combined last_service
-        ON last_service.id = base.latest_free_paid_id
+LEFT JOIN chassis_call_cases cc
+    ON cc.chassis_number COLLATE utf8mb4_unicode_ci =
+       base.chassis_no COLLATE utf8mb4_unicode_ci
+
+LEFT JOIN call_case_statuses ccs
+    ON ccs.id = cc.status_id
+
+LEFT JOIN call_case_substatuses ccsub
+    ON ccsub.id = cc.substatus_id
+
+LEFT JOIN ro_master_combined last_service
+    ON last_service.id = base.latest_free_paid_id
 
     LEFT JOIN ro_master_combined last_any_service
         ON last_any_service.id = base.latest_service_id
@@ -490,6 +570,11 @@ LIMIT ? OFFSET ?
                 segment: row.segment || null,
                 lastFreePaidService,
                 serviceCount: Number(row.service_count || 0),
+
+                caseStatus: row.case_status || null,
+                caseSubstatus: row.case_substatus || null,
+                callStatus: row.call_status || null,
+
                 lastSyncedAt: row.updated_at,
                 lastServiceType: row.last_service_type_any || null,
                 lastServiceDate: row.last_service_date_any || null,
@@ -597,6 +682,26 @@ LIMIT ? OFFSET ?
     `
         );
 
+        const caseStatuses = await getCachedFilterQuery(
+            "caseStatuses",
+            `
+        SELECT id, status_name
+        FROM call_case_statuses
+        WHERE is_active = 1
+        ORDER BY status_name
+    `
+        );
+
+        const caseSubstatuses = await getCachedFilterQuery(
+            "caseSubstatuses",
+            `
+        SELECT id, status_id, substatus_name
+        FROM call_case_substatuses
+        WHERE is_active = 1
+        ORDER BY substatus_name
+    `
+        );
+
         console.log(
             `[Chassis Master] Delivery months query: ${Date.now() - deliveryMonthQueryStartedAt} ms`
         );
@@ -630,6 +735,8 @@ LIMIT ? OFFSET ?
             freePaidMonths,
             segments,
             deliveryMonths,
+            caseStatuses,
+            caseSubstatuses,
             pagination: {
                 total,
                 page,
@@ -811,7 +918,79 @@ created_at
     }
 };
 
+
+const updateSalesContactDetails = async (req, res) => {
+    try {
+        const chassisNumber = String(req.params.chassisNumber || "")
+            .trim()
+            .toUpperCase();
+
+        const mobileNumber = String(req.body.mobileNumber || "").trim();
+        const postalCode = String(req.body.postalCode || "").trim();
+
+        if (!/^\d{10}$/.test(mobileNumber)) {
+            return res.status(400).json({
+                success: false,
+                message: "Mobile number must contain exactly 10 digits",
+            });
+        }
+
+        if (!/^\d{6}$/.test(postalCode)) {
+            return res.status(400).json({
+                success: false,
+                message: "PIN code must contain exactly 6 digits",
+            });
+        }
+
+        const [result] = await pool.query(
+            `
+        UPDATE sales_data_combined s
+        INNER JOIN chassis_master cm
+          ON cm.sales_data_id = s.id
+        SET
+          s.mobile_no = ?,
+          s.postal_code = ?
+        WHERE cm.chassis_no = ?
+      `,
+            [mobileNumber, postalCode, chassisNumber]
+        );
+
+        if (result.affectedRows === 0) {
+            const [rows] = await pool.query(
+                `SELECT id FROM chassis_master WHERE chassis_no = ?`,
+                [chassisNumber]
+            );
+
+            if (!rows.length) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Chassis record not found",
+                });
+            }
+
+            return res.status(400).json({
+                success: false,
+                message: "No linked Sales Data record found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Sales contact details updated successfully",
+        });
+    } catch (error) {
+        console.error("Update Sales Contact Details Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update sales contact details",
+        });
+    }
+};
+
+
 module.exports = {
     getChassisMaster,
     getChassisMasterDetails,
+    updateSalesContactDetails
 };

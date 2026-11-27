@@ -45,6 +45,14 @@ function ChassisMaster() {
   const [deliveryMonths, setDeliveryMonths] = useState([]);
   const [selectedDeliveryMonth, setSelectedDeliveryMonth] = useState("");
 
+  const [selectedCallStatus, setSelectedCallStatus] = useState("");
+
+  const [caseStatuses, setCaseStatuses] = useState([]);
+  const [caseSubstatuses, setCaseSubstatuses] = useState([]);
+
+  const [selectedCaseStatus, setSelectedCaseStatus] = useState("");
+  const [selectedCaseSubstatus, setSelectedCaseSubstatus] = useState("");
+
   // ========================================
   // FETCH CHASSIS MASTER
   // ========================================
@@ -58,6 +66,9 @@ function ChassisMaster() {
     locationValue = locationFilter,
     segmentValue = selectedSegment,
     deliveryMonthValue = selectedDeliveryMonth,
+    callStatusValue = selectedCallStatus,
+    caseStatusValue = selectedCaseStatus,
+    caseSubstatusValue = selectedCaseSubstatus,
   ) => {
     try {
       setLoading(true);
@@ -72,7 +83,10 @@ function ChassisMaster() {
           dealerBranchValue,
         )}&freePaidMonth=${encodeURIComponent(
           monthValue,
-        )}&locationFilter=${encodeURIComponent(locationValue.trim())}&segment=${encodeURIComponent(segmentValue)}&deliveryMonth=${encodeURIComponent(deliveryMonthValue)}`,
+        )}&locationFilter=${encodeURIComponent(
+          locationValue.trim(),
+        )}&segment=${encodeURIComponent(segmentValue)}&deliveryMonth=${encodeURIComponent(deliveryMonthValue)}&callStatus=${encodeURIComponent(callStatusValue)}&caseStatusId=${encodeURIComponent(caseStatusValue)}
+&caseSubstatusId=${encodeURIComponent(caseSubstatusValue)}`,
       );
 
       setRecords(response.data.records || []);
@@ -81,6 +95,8 @@ function ChassisMaster() {
       setFreePaidMonths(response.data.freePaidMonths || []);
       setSegments(response.data.segments || []);
       setDeliveryMonths(response.data.deliveryMonths || []);
+      setCaseStatuses(response.data.caseStatuses || []);
+      setCaseSubstatuses(response.data.caseSubstatuses || []);
 
       setPagination(
         response.data.pagination || {
@@ -438,7 +454,118 @@ function ChassisMaster() {
                     </div>
                   </th>
                   <th>Service Count</th>
-                  <th>Last Synced</th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Case Status</span>
+
+                      <select
+                        value={selectedCaseStatus}
+                        onChange={(e) => {
+                          const value = e.target.value;
+
+                          setSelectedCaseStatus(value);
+                          setSelectedCaseSubstatus("");
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                            locationFilter,
+                            selectedSegment,
+                            selectedDeliveryMonth,
+                            selectedCallStatus,
+                            value,
+                            "",
+                          );
+                        }}
+                      >
+                        <option value="">All Case Statuses</option>
+
+                        {caseStatuses.map((status) => (
+                          <option key={status.id} value={status.id}>
+                            {status.status_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </th>
+
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Case Substatus</span>
+
+                      <select
+                        value={selectedCaseSubstatus}
+                        disabled={!selectedCaseStatus}
+                        onChange={(e) => {
+                          const value = e.target.value;
+
+                          setSelectedCaseSubstatus(value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                            locationFilter,
+                            selectedSegment,
+                            selectedDeliveryMonth,
+                            selectedCallStatus,
+                            selectedCaseStatus,
+                            value,
+                          );
+                        }}
+                      >
+                        <option value="">All Substatuses</option>
+
+                        {caseSubstatuses
+                          .filter(
+                            (item) =>
+                              String(item.status_id) ===
+                              String(selectedCaseStatus),
+                          )
+                          .map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.substatus_name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </th>
+                  <th>
+                    <div className="rd-kit-sales-master-th-filter">
+                      <span>Call Status</span>
+
+                      <select
+                        value={selectedCallStatus}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setSelectedCallStatus(value);
+
+                          fetchChassisMaster(
+                            1,
+                            search,
+                            selectedSaleBranch,
+                            selectedDealerBranch,
+                            selectedFreePaidMonth,
+                            locationFilter,
+                            selectedSegment,
+                            selectedDeliveryMonth,
+                            value,
+                          );
+                        }}
+                      >
+                        <option value="">All Statuses</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Complaint">Complaint</option>
+                        <option value="Follow-up">Follow-up</option>
+                      </select>
+                    </div>
+                  </th>
+                  {/* <th>Last Synced</th> */}
                 </tr>
               </thead>
 
@@ -472,8 +599,11 @@ function ChassisMaster() {
 
                       <td>{record.salesData?.postalCode || "—"}</td>
 
-                      <td>
-                        <div className="rd-kit-sales-master-place">
+                      <td className="rd-kit-sales-master-location-cell">
+                        <div
+                          className="rd-kit-sales-master-place"
+                          title={`Place: ${record.place || "—"} | District: ${record.district || "—"}`}
+                        >
                           <strong>{record.place || "—"}</strong>
                           <small>{record.district || "—"}</small>
                         </div>
@@ -524,13 +654,45 @@ function ChassisMaster() {
                           {formatNumber(record.serviceCount)}
                         </span>
                       </td>
+                      <td>
+                        {record.caseStatus ? (
+                          <span className="rd-kit-case-status">
+                            {record.caseStatus}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
 
-                      <td>{formatDate(record.lastSyncedAt)}</td>
+                      <td>
+                        {record.caseSubstatus ? (
+                          <span className="rd-kit-case-substatus">
+                            {record.caseSubstatus}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td>
+                        {record.callStatus ? (
+                          <span
+                            className={`rd-kit-call-status rd-kit-call-status-${record.callStatus
+                              .toLowerCase()
+                              .replace(/[^a-z]+/g, "-")}`}
+                          >
+                            {record.callStatus}
+                          </span>
+                        ) : (
+                          <span className="rd-kit-call-status-empty">—</span>
+                        )}
+                      </td>
+
+                      {/* <td>{formatDate(record.lastSyncedAt)}</td> */}
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="16" className="rd-kit-sales-master-empty">
+                    <td colSpan="18" className="rd-kit-sales-master-empty">
                       No Chassis Master records found
                     </td>
                   </tr>

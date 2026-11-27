@@ -405,10 +405,13 @@ const getCallCase = async (req, res) => {
         c.chassis_number,
         c.status_id,
         c.substatus_id,
+        c.call_status,
         s.status_name,
         ss.substatus_name,
         DATE_FORMAT(c.contact_date, '%Y-%m-%d') AS contact_date,
         DATE_FORMAT(c.followup_date, '%Y-%m-%d') AS followup_date,
+        c.phone_number,
+        c.pincode,
         c.customer_voice,
         c.updated_by,
         c.updated_by_name,
@@ -451,8 +454,11 @@ const saveCallCase = async (req, res) => {
         const {
             statusId,
             substatusId,
+            callStatus,
             contactDate,
             followupDate,
+            phoneNumber,
+            pincode,
             customerVoice,
         } = req.body;
 
@@ -509,6 +515,28 @@ const saveCallCase = async (req, res) => {
                 message: "Select a case status before selecting a substatus",
             });
         }
+        const allowedCallStatuses = [
+            "Closed",
+            "Complaint",
+            "Follow-up",
+        ];
+
+        const cleanCallStatus =
+            callStatus === "" ||
+                callStatus === undefined ||
+                callStatus === null
+                ? null
+                : String(callStatus);
+
+        if (
+            cleanCallStatus !== null &&
+            !allowedCallStatuses.includes(cleanCallStatus)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid call status",
+            });
+        }
 
         const cleanContactDate = contactDate || null;
         const cleanFollowupDate = followupDate || null;
@@ -516,6 +544,30 @@ const saveCallCase = async (req, res) => {
             customerVoice === undefined || customerVoice === null
                 ? null
                 : String(customerVoice).trim() || null;
+
+        const cleanPhoneNumber =
+            phoneNumber === undefined || phoneNumber === null
+                ? null
+                : String(phoneNumber).replace(/\D/g, "").trim() || null;
+
+        const cleanPincode =
+            pincode === undefined || pincode === null
+                ? null
+                : String(pincode).replace(/\D/g, "").trim() || null;
+
+        if (cleanPhoneNumber && !/^\d{10}$/.test(cleanPhoneNumber)) {
+            return res.status(400).json({
+                success: false,
+                message: "Phone number must contain exactly 10 digits",
+            });
+        }
+
+        if (cleanPincode && !/^\d{6}$/.test(cleanPincode)) {
+            return res.status(400).json({
+                success: false,
+                message: "Pincode must contain exactly 6 digits",
+            });
+        }
 
         const validDate = (value) => {
             if (value === null) return true;
@@ -648,17 +700,23 @@ const saveCallCase = async (req, res) => {
         const oldValues = {
             status: oldCase.status_name || null,
             substatus: oldCase.substatus_name || null,
+            callStatus: oldCase.call_status || null,
             contactDate: oldCase.old_contact_date || null,
             followupDate: oldCase.old_followup_date || null,
             customerVoice: oldCase.customer_voice || null,
+            phoneNumber: oldCase.phone_number || null,
+            pincode: oldCase.pincode || null,
         };
 
         const newValues = {
             status: newStatusName,
             substatus: newSubstatusName,
+            callStatus: cleanCallStatus,
             contactDate: cleanContactDate,
             followupDate: cleanFollowupDate,
             customerVoice: cleanCustomerVoice,
+            phoneNumber: cleanPhoneNumber,
+            pincode: cleanPincode,
         };
 
         const changedFields = [];
@@ -669,6 +727,9 @@ const saveCallCase = async (req, res) => {
 
         if (oldCase.substatus_id !== cleanSubstatusId) {
             changedFields.push("substatus");
+        }
+        if (oldValues.callStatus !== newValues.callStatus) {
+            changedFields.push("callStatus");
         }
 
         if (oldValues.contactDate !== newValues.contactDate) {
@@ -683,6 +744,14 @@ const saveCallCase = async (req, res) => {
             changedFields.push("customerVoice");
         }
 
+        if (oldValues.phoneNumber !== newValues.phoneNumber) {
+            changedFields.push("phoneNumber");
+        }
+
+        if (oldValues.pincode !== newValues.pincode) {
+            changedFields.push("pincode");
+        }
+
         const updatedBy = String(req.user.id);
         const updatedByName =
             req.user.name || req.user.fullName || "Unknown";
@@ -692,8 +761,11 @@ const saveCallCase = async (req, res) => {
        SET
         status_id = ?,
         substatus_id = ?,
+        call_status = ?,
         contact_date = ?,
         followup_date = ?,
+        phone_number = ?,
+        pincode = ?,
         customer_voice = ?,
         updated_by = ?,
         updated_by_name = ?,
@@ -702,8 +774,11 @@ const saveCallCase = async (req, res) => {
             [
                 cleanStatusId,
                 cleanSubstatusId,
+                cleanCallStatus,
                 cleanContactDate,
                 cleanFollowupDate,
+                cleanPhoneNumber,
+                cleanPincode,
                 cleanCustomerVoice,
                 updatedBy,
                 updatedByName,
@@ -719,29 +794,45 @@ const saveCallCase = async (req, res) => {
           chassis_number,
           old_status,
           new_status,
+          old_call_status,
+          new_call_status,
           old_substatus,
           new_substatus,
           old_contact_date,
           new_contact_date,
           old_followup_date,
           new_followup_date,
+          old_phone_number,
+          new_phone_number,
+          old_pincode,
+          new_pincode,
           old_customer_voice,
           new_customer_voice,
           changed_fields,
           updated_by,
           updated_by_name
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?
+        )`,
                 [
                     oldCase.id,
                     cleanChassisNumber,
                     oldValues.status,
                     newValues.status,
+                    oldValues.callStatus,
+                    newValues.callStatus,
                     oldValues.substatus,
                     newValues.substatus,
                     oldValues.contactDate,
                     newValues.contactDate,
                     oldValues.followupDate,
                     newValues.followupDate,
+                    oldValues.phoneNumber,
+                    newValues.phoneNumber,
+                    oldValues.pincode,
+                    newValues.pincode,
                     oldValues.customerVoice,
                     newValues.customerVoice,
                     JSON.stringify(changedFields),
@@ -799,10 +890,16 @@ const getCallCaseHistory = async (req, res) => {
         new_status,
         old_substatus,
         new_substatus,
+        old_call_status,
+        new_call_status,
         old_contact_date,
         new_contact_date,
         old_followup_date,
         new_followup_date,
+        old_phone_number,
+        new_phone_number,
+        old_pincode,
+        new_pincode,
         old_customer_voice,
         new_customer_voice,
         changed_fields,
@@ -846,32 +943,32 @@ const getCallCaseHistory = async (req, res) => {
 
 
 const getAdminCaseStatuses = async (req, res) => {
-  try {
-    const [statuses] = await pool.query(`
+    try {
+        const [statuses] = await pool.query(`
       SELECT id, status_name, is_active, created_at
       FROM call_case_statuses
       ORDER BY status_name ASC
     `);
 
-    const [substatuses] = await pool.query(`
+        const [substatuses] = await pool.query(`
       SELECT id, status_id, substatus_name, is_active, created_at
       FROM call_case_substatuses
       ORDER BY substatus_name ASC
     `);
 
-    res.json({
-      success: true,
-      statuses,
-      substatuses,
-    });
-  } catch (error) {
-    console.error("Get admin case statuses error:", error);
+        res.json({
+            success: true,
+            statuses,
+            substatuses,
+        });
+    } catch (error) {
+        console.error("Get admin case statuses error:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Unable to load case status management",
-    });
-  }
+        res.status(500).json({
+            success: false,
+            message: "Unable to load case status management",
+        });
+    }
 };
 
 

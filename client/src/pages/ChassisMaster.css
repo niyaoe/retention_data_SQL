@@ -886,3 +886,136 @@
   border-color: #e64a19;
   box-shadow: 0 0 0 2px rgba(230, 74, 25, 0.1);
 }
+
+
+/* tooltip for place district  */
+
+/* ========================================
+   FIXED PLACE / DISTRICT COLUMN
+======================================== */
+
+.rd-kit-sales-master .rd-kit-sales-master-table th:nth-child(7),
+.rd-kit-sales-master .rd-kit-sales-master-table td:nth-child(7) {
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
+}
+
+.rd-kit-sales-master .rd-kit-sales-master-location-cell {
+  overflow: hidden;
+}
+
+.rd-kit-sales-master .rd-kit-sales-master-place {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 160px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.rd-kit-sales-master .rd-kit-sales-master-place strong,
+.rd-kit-sales-master .rd-kit-sales-master-place small {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rd-kit-sales-master .rd-kit-sales-master-place strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rd-kit-sales-master .rd-kit-sales-master-place small {
+  font-size: 11px;
+  color: #777;
+}
+
+/* CASE STATUS */
+
+.rd-kit-sales-master .rd-kit-case-status,
+.rd-kit-sales-master .rd-kit-case-substatus {
+  display: inline-block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.rd-kit-sales-master .rd-kit-case-status {
+  background: #fff0e9;
+  color: #e64a19;
+}
+
+.rd-kit-sales-master .rd-kit-case-substatus {
+  background: #eeeeee;
+  color: #555;
+}
+
+
+/* Call status badges */
+.rd-kit-call-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rd-kit-call-status-closed {
+  color: #16834a;
+  background: #e8f7ee;
+}
+
+.rd-kit-call-status-complaint {
+  color: #d84315;
+  background: #fff0e9;
+}
+
+.rd-kit-call-status-follow-up {
+  color: #a66a00;
+  background: #fff5dc;
+}
+
+.rd-kit-call-status-empty {
+  color: #999;
+}
+
+.rd-kit-sales-master-th-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.rd-kit-sales-master-th-filter select {
+  width: 100%;
+  min-width: 120px;
+  padding: 6px 8px;
+  border: 1px solid #343434;
+  border-radius: 5px;
+  background: #1c1c1c;
+  color: #e64a19;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.rd-kit-sales-master-th-filter select:focus {
+  border-color: #e64a19;
+}
+
+.rd-kit-sales-master-th-filter select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
