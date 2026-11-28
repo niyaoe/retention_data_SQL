@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import {
   FiCalendar,
@@ -29,7 +28,7 @@ const OPEN_FILTERS = [
 
 function FollowupDashboard() {
   const currentUser = JSON.parse(
-    sessionStorage.getItem("retention_user") || "{}"
+    sessionStorage.getItem("retention_user") || "{}",
   );
 
   const isAdmin = currentUser.role === "admin";
@@ -47,7 +46,7 @@ function FollowupDashboard() {
 
   const [view, setView] = useState("open");
   const [statusFilter, setStatusFilter] = useState("");
-  const [assignedTo, setAssignedTo] = useState("");
+  const [updatedBy, setUpdatedBy] = useState("");
   const [search, setSearch] = useState("");
 
   const [page, setPage] = useState(1);
@@ -68,8 +67,8 @@ function FollowupDashboard() {
   const loadSummary = useCallback(async () => {
     const params = {};
 
-    if (isAdmin && assignedTo) {
-      params.assignedTo = assignedTo;
+    if (isAdmin && updatedBy) {
+      params.updatedBy = updatedBy;
     }
 
     const response = await api.get("/call-section/followups/summary", {
@@ -83,9 +82,9 @@ function FollowupDashboard() {
         closed: 0,
         complaints: 0,
         followups: 0,
-      }
+      },
     );
-  }, [isAdmin, assignedTo]);
+  }, [isAdmin, updatedBy]);
 
   // LOAD RECORDS
   const loadFollowups = useCallback(async () => {
@@ -99,8 +98,8 @@ function FollowupDashboard() {
       params.status = statusFilter;
     }
 
-    if (isAdmin && assignedTo) {
-      params.assignedTo = assignedTo;
+    if (isAdmin && updatedBy) {
+      params.updatedBy = updatedBy;
     }
 
     const response = await api.get("/call-section/followups", { params });
@@ -113,9 +112,9 @@ function FollowupDashboard() {
         limit: PAGE_LIMIT,
         total: 0,
         totalPages: 0,
-      }
+      },
     );
-  }, [page, view, statusFilter, isAdmin, assignedTo]);
+  }, [page, view, statusFilter, isAdmin, updatedBy]);
 
   // LOAD ACTIVE USERS FOR ADMIN
   const loadUsers = useCallback(async () => {
@@ -125,8 +124,8 @@ function FollowupDashboard() {
 
     setUsers(
       (response.data.users || []).filter(
-        (user) => user.status === "active" || user.is_active === 1
-      )
+        (user) => user.status === "active" || user.is_active === 1,
+      ),
     );
   }, [isAdmin]);
 
@@ -136,15 +135,10 @@ function FollowupDashboard() {
     setError("");
 
     try {
-      await Promise.all([
-        loadSummary(),
-        loadFollowups(),
-        loadUsers(),
-      ]);
+      await Promise.all([loadSummary(), loadFollowups(), loadUsers()]);
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          "Unable to load follow-up dashboard."
+        err.response?.data?.message || "Unable to load follow-up dashboard.",
       );
     } finally {
       setLoading(false);
@@ -186,9 +180,7 @@ function FollowupDashboard() {
       setSuccess("Record assigned successfully.");
       await loadDashboard();
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Unable to assign record."
-      );
+      setError(err.response?.data?.message || "Unable to assign record.");
     } finally {
       setActionId(null);
     }
@@ -262,9 +254,7 @@ function FollowupDashboard() {
           disabled={loading}
           title="Refresh"
         >
-          <FiRefreshCw
-            className={loading ? "rd-kit-followups-spin" : ""}
-          />
+          <FiRefreshCw className={loading ? "rd-kit-followups-spin" : ""} />
         </button>
       </div>
 
@@ -388,12 +378,12 @@ function FollowupDashboard() {
           {isAdmin && (
             <select
               className="rd-kit-followups-user-filter"
-              value={assignedTo}
+              value={updatedBy}
               onChange={(e) => {
-                setAssignedTo(e.target.value);
+                setUpdatedBy(e.target.value);
                 setPage(1);
               }}
-              aria-label="Filter by assigned user"
+              aria-label="Filter by updated user"
             >
               <option value="">All Users</option>
               {users.map((user) => (
@@ -472,22 +462,16 @@ function FollowupDashboard() {
                     <button
                       type="button"
                       className="rd-kit-followups-chassis-link"
-                      onClick={() =>
-                        setSelectedChassis(item.chassis_number)
-                      }
+                      onClick={() => setSelectedChassis(item.chassis_number)}
                       title="View chassis details"
                     >
                       {item.chassis_number || "—"}
                     </button>
                   </td>
 
-                  <td>
-                    {formatDate(item.contact_date)}
-                  </td>
+                  <td>{formatDate(item.contact_date)}</td>
 
-                  <td>
-                    {formatDate(item.followup_date)}
-                  </td>
+                  <td>{formatDate(item.followup_date)}</td>
 
                   <td className="rd-kit-followups-voice">
                     {item.customer_voice || "—"}
@@ -496,7 +480,7 @@ function FollowupDashboard() {
                   <td>
                     <span
                       className={`rd-kit-followups-call-status ${getStatusClass(
-                        item.call_status
+                        item.call_status,
                       )}`}
                     >
                       {item.call_status || "Not set"}
@@ -518,9 +502,7 @@ function FollowupDashboard() {
                         className="rd-kit-followups-assign"
                         value={item.assigned_to || ""}
                         disabled={actionId === item.id}
-                        onChange={(e) =>
-                          handleAssign(item.id, e.target.value)
-                        }
+                        onChange={(e) => handleAssign(item.id, e.target.value)}
                         aria-label={`Assign ${item.chassis_number}`}
                       >
                         <option value="" disabled>
@@ -528,10 +510,7 @@ function FollowupDashboard() {
                         </option>
 
                         {users.map((user) => (
-                          <option
-                            key={getUserId(user)}
-                            value={getUserId(user)}
-                          >
+                          <option key={getUserId(user)} value={getUserId(user)}>
                             {getUserName(user)}
                           </option>
                         ))}

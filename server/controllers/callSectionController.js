@@ -519,23 +519,22 @@ const saveCallCase = async (req, res) => {
                 message: "Select a case status before selecting a substatus",
             });
         }
+        const cleanCallStatus = String(callStatus || "").trim();
+
         const allowedCallStatuses = [
             "Closed",
             "Complaint",
             "Follow-up",
         ];
 
-        const cleanCallStatus =
-            callStatus === "" ||
-                callStatus === undefined ||
-                callStatus === null
-                ? null
-                : String(callStatus);
+        if (!cleanCallStatus) {
+            return res.status(400).json({
+                success: false,
+                message: "Call status is required",
+            });
+        }
 
-        if (
-            cleanCallStatus !== null &&
-            !allowedCallStatuses.includes(cleanCallStatus)
-        ) {
+        if (!allowedCallStatuses.includes(cleanCallStatus)) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid call status",
@@ -757,68 +756,15 @@ const saveCallCase = async (req, res) => {
         }
 
 
-        const currentUserId = Number(req.user.id);
-        const isAdmin = req.user.role === "admin";
+        // Ownership restrictions removed.
+        // Any authenticated user can update any call record.
+        // Do not automatically assign records to the current user.
 
-        const contactDateChanged =
-            oldValues.contactDate !== newValues.contactDate;
+        // Preserve existing assignment value without enforcing ownership.
 
         const followupChanged =
             oldValues.followupDate !== newValues.followupDate;
 
-        const currentOwnerId =
-            oldCase.assigned_to === null ||
-                oldCase.assigned_to === undefined
-                ? null
-                : Number(oldCase.assigned_to);
-
-        // Ownership is controlled by contact date, not follow-up date.
-        if (!isAdmin) {
-            // Prevent another user from editing an assigned record.
-            if (
-                currentOwnerId !== null &&
-                currentOwnerId !== currentUserId
-            ) {
-                await connection.rollback();
-                transactionStarted = false;
-
-                return res.status(403).json({
-                    success: false,
-                    message: "This record is assigned to another user.",
-                });
-            }
-
-            // Legacy records with a contact date but no owner
-            // must be assigned by admin.
-            if (
-                oldValues.contactDate &&
-                currentOwnerId === null
-            ) {
-                await connection.rollback();
-                transactionStarted = false;
-
-                return res.status(403).json({
-                    success: false,
-                    message: "This record has no assigned owner. Please contact admin.",
-                });
-            }
-        }
-
-        // Preserve an existing owner.
-        let assignedTo = currentOwnerId;
-
-        // Assign the current user when contact date is entered
-        // for the first time and the record has no owner.
-        if (
-            !oldValues.contactDate &&
-            cleanContactDate &&
-            currentOwnerId === null
-        ) {
-            assignedTo = currentUserId;
-        }
-
-        // Changing a follow-up date resets completion.
-        // Ownership is independent of follow-up date.
         const followupCompletedAt = followupChanged
             ? null
             : oldCase.followup_completed_at;
@@ -836,9 +782,8 @@ const saveCallCase = async (req, res) => {
      substatus_id = ?,
      call_status = ?,
      contact_date = ?,
-     followup_date = ?,
-     assigned_to = ?,
-     followup_completed_at = ?,
+           followup_date = ?,
+      followup_completed_at = ?,
      phone_number = ?,
      pincode = ?,
      customer_voice = ?,
@@ -852,7 +797,7 @@ const saveCallCase = async (req, res) => {
                 cleanCallStatus,
                 cleanContactDate,
                 cleanFollowupDate,
-                assignedTo,
+
                 followupCompletedAt,
                 cleanPhoneNumber,
                 cleanPincode,
@@ -861,6 +806,17 @@ const saveCallCase = async (req, res) => {
                 updatedByName,
                 oldCase.id,
             ]
+        );
+
+        // Track every user who saves this case.
+        // Never remove previous users from this table.
+        await connection.query(
+            `INSERT INTO chassis_call_case_users
+        (case_id, user_id)
+     VALUES (?, ?)
+     ON DUPLICATE KEY UPDATE
+        last_updated_at = CURRENT_TIMESTAMP`,
+            [oldCase.id, Number(req.user.id)]
         );
 
         // Add history only when something actually changed
@@ -1056,22 +1012,52 @@ const getFollowupSummary = async (req, res) => {
         const where = [];
         const params = [];
 
-        if (!isAdmin) {
-            where.push("assigned_to = ?");
-            params.push(req.user.id);
-        } else if (req.query.assignedTo) {
-            const assignedTo = Number(req.query.assignedTo);
+        // All users can see all call records.
+        // Admin can optionally filter by assigned user.
+        // Admin can optionally filter by assigned user.
+        // Admin can filter by the user who last updated the record.
+        // Admin can filter by any user who has handled the case.
+        if (isAdmin && req.query.updatedBy) {
+            const updatedBy = Number(req.query.updatedBy);
 
-            if (!Number.isInteger(assignedTo) || assignedTo <= 0) {
+            if (!Number.isInteger(updatedBy) || updatedBy <= 0) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid assigned user ID",
+                    message: "Invalid user ID",
                 });
             }
 
-            where.push("assigned_to = ?");
-            params.push(assignedTo);
+            where.push(`
+        EXISTS (
+            SELECT 1
+            FROM chassis_call_case_users cu
+            WHERE cu.case_id = chassis_call_cases.id
+              AND cu.user_id = ?
+        )
+    `);
+
+            params.push(updatedBy);
         }
+
+        // Regular users see every case they have handled.
+        if (!isAdmin) {
+            where.push(`
+        EXISTS (
+            SELECT 1
+            FROM chassis_call_case_users cu
+            WHERE cu.case_id = chassis_call_cases.id
+              AND cu.user_id = ?
+        )
+    `);
+
+            params.push(Number(req.user.id));
+        }
+
+        // Regular users see only records they last updated.
+        // if (!isAdmin) {
+        //     where.push("updated_by = ?");
+        //     params.push(String(req.user.id));
+        // }
 
         const whereSQL = where.length
             ? `WHERE ${where.join(" AND ")}`
@@ -1157,22 +1143,52 @@ const getFollowups = async (req, res) => {
         const params = [];
 
         // Regular users can only see their assigned records.
-        if (!isAdmin) {
-            where.push("c.assigned_to = ?");
-            params.push(req.user.id);
-        } else if (req.query.assignedTo) {
-            const assignedTo = Number(req.query.assignedTo);
+        // All users can view and handle every call record.
+        // Admin can optionally filter by assigned user.
+        // Admin can optionally filter by assigned user.
+        // Admin can filter by the user who last updated the record.
+        // Admin can filter by any user who has handled the case.
+        if (isAdmin && req.query.updatedBy) {
+            const updatedBy = Number(req.query.updatedBy);
 
-            if (!Number.isInteger(assignedTo) || assignedTo <= 0) {
+            if (!Number.isInteger(updatedBy) || updatedBy <= 0) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid assigned user ID",
+                    message: "Invalid user ID",
                 });
             }
 
-            where.push("c.assigned_to = ?");
-            params.push(assignedTo);
+            where.push(`
+        EXISTS (
+            SELECT 1
+            FROM chassis_call_case_users cu
+            WHERE cu.case_id = c.id
+              AND cu.user_id = ?
+        )
+    `);
+
+            params.push(updatedBy);
         }
+
+        // Regular users see every case they have handled.
+        if (!isAdmin) {
+            where.push(`
+        EXISTS (
+            SELECT 1
+            FROM chassis_call_case_users cu
+            WHERE cu.case_id = c.id
+              AND cu.user_id = ?
+        )
+    `);
+
+            params.push(Number(req.user.id));
+        }
+
+        // Regular users see only records they last updated.
+        // if (!isAdmin) {
+        //     where.push("c.updated_by = ?");
+        //     params.push(String(req.user.id));
+        // }
 
         // Open and closed views are controlled only by call_status.
         if (view === "open") {
