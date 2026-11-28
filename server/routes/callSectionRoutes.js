@@ -4,7 +4,7 @@ const router = express.Router();
 
 const {
     getCaseStatuses,
-    createCaseStatus,   
+    createCaseStatus,
     updateCaseStatus,
     getCaseSubstatuses,
     createCaseSubstatus,
@@ -12,7 +12,11 @@ const {
     getCallCase,
     saveCallCase,
     getCallCaseHistory,
-    getAdminCaseStatuses
+    getAdminCaseStatuses,
+
+    getFollowupSummary,
+    getFollowups,
+    assignFollowup,
 } = require("../controllers/callSectionController");
 
 const {
@@ -59,10 +63,23 @@ router.put(
 );
 
 router.get(
-  "/admin/statuses",
-  protect,
-  authorize("admin"),
-  getAdminCaseStatuses
+    "/admin/statuses",
+    protect,
+    authorize("admin"),
+    getAdminCaseStatuses
+);
+
+// FOLLOW-UP ROUTES
+router.get("/followups/summary", protect, getFollowupSummary);
+
+router.get("/followups", protect, getFollowups);
+
+
+router.put(
+    "/followups/:id/assign",
+    protect,
+    authorize("admin"),
+    assignFollowup
 );
 
 router.get("/:chassisNumber", protect, getCallCase);

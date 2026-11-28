@@ -18,6 +18,7 @@ import DmsRetail from "./pages/DmsRetail";
 import ServiceAction from "./pages/ServiceAction";
 import ServiceActionExcelImport from "./pages/ServiceActionExcelImport";
 import CaseStatusManagement from "./pages/CaseStatusManagement";
+import FollowupDashboard from "./pages/FollowupDashboard";
 
 function AdminOnly({ children }) {
   const { user } = useOutletContext();
@@ -100,6 +101,7 @@ function App() {
               </AdminOnly>
             }
           />
+          <Route path="/followups" element={<FollowupDashboard />} />
 
           <Route path="/users" element={<UserManagement />} />
 

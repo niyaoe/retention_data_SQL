@@ -49,6 +49,12 @@ function Sidebar({ user, collapsed, mobileOpen, onClose, onToggle }) {
       roles: ["admin", "user"],
     },
     {
+      title: "Follow-up Dashboard",
+      path: "/followups",
+      icon: <FiPhoneCall />,
+      roles: ["admin", "user"],
+    },
+    {
       title: "Sales Excel Import",
       path: "/sales-import",
       icon: <FiFile />,

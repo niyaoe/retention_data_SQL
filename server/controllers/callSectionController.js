@@ -410,6 +410,9 @@ const getCallCase = async (req, res) => {
         ss.substatus_name,
         DATE_FORMAT(c.contact_date, '%Y-%m-%d') AS contact_date,
         DATE_FORMAT(c.followup_date, '%Y-%m-%d') AS followup_date,
+        c.assigned_to,
+c.followup_completed_at,
+u.full_name AS assigned_to_name,
         c.phone_number,
         c.pincode,
         c.customer_voice,
@@ -420,6 +423,7 @@ const getCallCase = async (req, res) => {
       FROM chassis_call_cases c
       LEFT JOIN call_case_statuses s ON s.id = c.status_id
       LEFT JOIN call_case_substatuses ss ON ss.id = c.substatus_id
+      LEFT JOIN users u ON u.id = c.assigned_to
       WHERE c.chassis_number = ?
       LIMIT 1`,
             [chassisNumber]
@@ -752,31 +756,104 @@ const saveCallCase = async (req, res) => {
             changedFields.push("pincode");
         }
 
+
+        const currentUserId = Number(req.user.id);
+        const isAdmin = req.user.role === "admin";
+
+        const contactDateChanged =
+            oldValues.contactDate !== newValues.contactDate;
+
+        const followupChanged =
+            oldValues.followupDate !== newValues.followupDate;
+
+        const currentOwnerId =
+            oldCase.assigned_to === null ||
+                oldCase.assigned_to === undefined
+                ? null
+                : Number(oldCase.assigned_to);
+
+        // Ownership is controlled by contact date, not follow-up date.
+        if (!isAdmin) {
+            // Prevent another user from editing an assigned record.
+            if (
+                currentOwnerId !== null &&
+                currentOwnerId !== currentUserId
+            ) {
+                await connection.rollback();
+                transactionStarted = false;
+
+                return res.status(403).json({
+                    success: false,
+                    message: "This record is assigned to another user.",
+                });
+            }
+
+            // Legacy records with a contact date but no owner
+            // must be assigned by admin.
+            if (
+                oldValues.contactDate &&
+                currentOwnerId === null
+            ) {
+                await connection.rollback();
+                transactionStarted = false;
+
+                return res.status(403).json({
+                    success: false,
+                    message: "This record has no assigned owner. Please contact admin.",
+                });
+            }
+        }
+
+        // Preserve an existing owner.
+        let assignedTo = currentOwnerId;
+
+        // Assign the current user when contact date is entered
+        // for the first time and the record has no owner.
+        if (
+            !oldValues.contactDate &&
+            cleanContactDate &&
+            currentOwnerId === null
+        ) {
+            assignedTo = currentUserId;
+        }
+
+        // Changing a follow-up date resets completion.
+        // Ownership is independent of follow-up date.
+        const followupCompletedAt = followupChanged
+            ? null
+            : oldCase.followup_completed_at;
+
+
+
         const updatedBy = String(req.user.id);
         const updatedByName =
             req.user.name || req.user.fullName || "Unknown";
 
         await connection.query(
             `UPDATE chassis_call_cases
-       SET
-        status_id = ?,
-        substatus_id = ?,
-        call_status = ?,
-        contact_date = ?,
-        followup_date = ?,
-        phone_number = ?,
-        pincode = ?,
-        customer_voice = ?,
-        updated_by = ?,
-        updated_by_name = ?,
-        updated_at = CURRENT_TIMESTAMP
-       WHERE id = ?`,
+   SET
+     status_id = ?,
+     substatus_id = ?,
+     call_status = ?,
+     contact_date = ?,
+     followup_date = ?,
+     assigned_to = ?,
+     followup_completed_at = ?,
+     phone_number = ?,
+     pincode = ?,
+     customer_voice = ?,
+     updated_by = ?,
+     updated_by_name = ?,
+     updated_at = CURRENT_TIMESTAMP
+   WHERE id = ?`,
             [
                 cleanStatusId,
                 cleanSubstatusId,
                 cleanCallStatus,
                 cleanContactDate,
                 cleanFollowupDate,
+                assignedTo,
+                followupCompletedAt,
                 cleanPhoneNumber,
                 cleanPincode,
                 cleanCustomerVoice,
@@ -972,6 +1049,275 @@ const getAdminCaseStatuses = async (req, res) => {
 };
 
 
+// GET FOLLOW-UP DASHBOARD SUMMARY
+const getFollowupSummary = async (req, res) => {
+    try {
+        const isAdmin = req.user.role === "admin";
+        const where = [];
+        const params = [];
+
+        if (!isAdmin) {
+            where.push("assigned_to = ?");
+            params.push(req.user.id);
+        } else if (req.query.assignedTo) {
+            const assignedTo = Number(req.query.assignedTo);
+
+            if (!Number.isInteger(assignedTo) || assignedTo <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid assigned user ID",
+                });
+            }
+
+            where.push("assigned_to = ?");
+            params.push(assignedTo);
+        }
+
+        const whereSQL = where.length
+            ? `WHERE ${where.join(" AND ")}`
+            : "";
+
+        const [rows] = await pool.query(
+            `SELECT
+                COUNT(*) AS total,
+                COALESCE(SUM(call_status IN ('Complaint', 'Follow-up')), 0) AS open,
+                COALESCE(SUM(call_status = 'Closed'), 0) AS closed,
+                COALESCE(SUM(call_status = 'Complaint'), 0) AS complaints,
+                COALESCE(SUM(call_status = 'Follow-up'), 0) AS followups
+             FROM chassis_call_cases
+             ${whereSQL}`,
+            params
+        );
+
+        const summary = rows[0];
+
+        res.json({
+            success: true,
+            summary: {
+                total: Number(summary.total),
+                open: Number(summary.open),
+                closed: Number(summary.closed),
+                complaints: Number(summary.complaints),
+                followups: Number(summary.followups),
+            },
+        });
+    } catch (error) {
+        console.error("Follow-up summary error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to load follow-up summary",
+        });
+    }
+};
+
+
+// GET FOLLOW-UP DASHBOARD LIST
+const getFollowups = async (req, res) => {
+    try {
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = Math.min(
+            100,
+            Math.max(1, parseInt(req.query.limit, 10) || 25)
+        );
+        const offset = (page - 1) * limit;
+
+        const isAdmin = req.user.role === "admin";
+        const view = req.query.view || "open";
+        const status = req.query.status;
+
+        if (!["open", "closed", "all"].includes(view)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid dashboard view",
+            });
+        }
+
+        if (
+            status &&
+            !["Complaint", "Follow-up", "Closed"].includes(status)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid call status",
+            });
+        }
+
+        if (
+            (view === "open" && status === "Closed") ||
+            (view === "closed" && status && status !== "Closed")
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Call status does not match dashboard view",
+            });
+        }
+
+        const where = [];
+        const params = [];
+
+        // Regular users can only see their assigned records.
+        if (!isAdmin) {
+            where.push("c.assigned_to = ?");
+            params.push(req.user.id);
+        } else if (req.query.assignedTo) {
+            const assignedTo = Number(req.query.assignedTo);
+
+            if (!Number.isInteger(assignedTo) || assignedTo <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid assigned user ID",
+                });
+            }
+
+            where.push("c.assigned_to = ?");
+            params.push(assignedTo);
+        }
+
+        // Open and closed views are controlled only by call_status.
+        if (view === "open") {
+            where.push("c.call_status IN ('Complaint', 'Follow-up')");
+        } else if (view === "closed") {
+            where.push("c.call_status = 'Closed'");
+        }
+
+        // Optional status filter inside the open view.
+        if (status) {
+            where.push("c.call_status = ?");
+            params.push(status);
+        }
+
+        const whereSQL = where.length
+            ? `WHERE ${where.join(" AND ")}`
+            : "";
+
+        const [followups] = await pool.query(
+            `SELECT
+                c.id,
+                c.chassis_number,
+                c.status_id,
+                c.substatus_id,
+                s.status_name,
+                ss.substatus_name,
+                c.call_status,
+                DATE_FORMAT(c.contact_date, '%Y-%m-%d') AS contact_date,
+                DATE_FORMAT(c.followup_date, '%Y-%m-%d') AS followup_date,
+                c.assigned_to,
+                u.full_name AS assigned_to_name,
+                c.phone_number,
+                c.customer_voice,
+                c.updated_by_name,
+                c.updated_at
+             FROM chassis_call_cases c
+             LEFT JOIN call_case_statuses s
+                ON s.id = c.status_id
+             LEFT JOIN call_case_substatuses ss
+                ON ss.id = c.substatus_id
+             LEFT JOIN users u
+                ON u.id = c.assigned_to
+             ${whereSQL}
+             ORDER BY c.updated_at DESC, c.id DESC
+             LIMIT ? OFFSET ?`,
+            [...params, limit, offset]
+        );
+
+        const [countRows] = await pool.query(
+            `SELECT COUNT(*) AS total
+             FROM chassis_call_cases c
+             ${whereSQL}`,
+            params
+        );
+
+        const total = Number(countRows[0].total);
+
+        res.json({
+            success: true,
+            followups,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        });
+    } catch (error) {
+        console.error("Get follow-ups error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to load follow-ups",
+        });
+    }
+};
+
+
+// ADMIN: ASSIGN A RECORD TO A USER
+const assignFollowup = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const userId = Number(req.body.userId);
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0 ||
+            !Number.isInteger(userId) ||
+            userId <= 0
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid record ID and user ID are required",
+            });
+        }
+
+        const [users] = await pool.query(
+            `SELECT id, full_name
+             FROM users
+             WHERE id = ? AND is_active = 1
+             LIMIT 1`,
+            [userId]
+        );
+
+        if (!users.length) {
+            return res.status(404).json({
+                success: false,
+                message: "Active user not found",
+            });
+        }
+
+        const [result] = await pool.query(
+            `UPDATE chassis_call_cases
+             SET assigned_to = ?,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?`,
+            [userId, id]
+        );
+
+        if (!result.affectedRows) {
+            return res.status(404).json({
+                success: false,
+                message: "Record not found",
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Record assigned successfully",
+            assignedTo: {
+                id: users[0].id,
+                name: users[0].full_name,
+            },
+        });
+    } catch (error) {
+        console.error("Assign record error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to assign record",
+        });
+    }
+};
+
+
 
 module.exports = {
     getCaseStatuses,
@@ -984,4 +1330,9 @@ module.exports = {
     saveCallCase,
     getCallCaseHistory,
     getAdminCaseStatuses,
+
+    // Follow-up Dashboard APIs
+    getFollowupSummary,
+    getFollowups,
+    assignFollowup,
 };

@@ -12,46 +12,76 @@ import "./ChassisMaster.css";
 
 import ChassisDetailsModal from "../components/ChassisDetailsModal";
 
+const CHASSIS_MASTER_STORAGE_KEY = "chassis_master_filters";
+
+const getSavedFilters = () => {
+  try {
+    return JSON.parse(
+      sessionStorage.getItem(CHASSIS_MASTER_STORAGE_KEY) || "{}",
+    );
+  } catch {
+    return {};
+  }
+};
+
 function ChassisMaster() {
   const [records, setRecords] = useState([]);
 
   const [pagination, setPagination] = useState({
     total: 0,
-    page: 1,
+    page: getSavedFilters().page || 1,
     limit: 25,
     totalPages: 0,
   });
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => getSavedFilters().search || "");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [selectedChassis, setSelectedChassis] = useState(null);
 
-  const [selectedSaleBranch, setSelectedSaleBranch] = useState("");
+  const [selectedSaleBranch, setSelectedSaleBranch] = useState(
+    () => getSavedFilters().selectedSaleBranch || "",
+  );
   const [branches, setBranches] = useState([]);
 
-  const [selectedDealerBranch, setSelectedDealerBranch] = useState("");
+  const [selectedDealerBranch, setSelectedDealerBranch] = useState(
+    () => getSavedFilters().selectedDealerBranch || "",
+  );
   const [dealerBranches, setDealerBranches] = useState([]);
 
   const [freePaidMonths, setFreePaidMonths] = useState([]);
-  const [selectedFreePaidMonth, setSelectedFreePaidMonth] = useState("");
+  const [selectedFreePaidMonth, setSelectedFreePaidMonth] = useState(
+    () => getSavedFilters().selectedFreePaidMonth || "",
+  );
 
-  const [locationFilter, setLocationFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState(
+    () => getSavedFilters().locationFilter || "",
+  );
 
-  const [selectedSegment, setSelectedSegment] = useState("");
+  const [selectedSegment, setSelectedSegment] = useState(
+    () => getSavedFilters().selectedSegment || "",
+  );
   const [segments, setSegments] = useState([]);
 
   const [deliveryMonths, setDeliveryMonths] = useState([]);
-  const [selectedDeliveryMonth, setSelectedDeliveryMonth] = useState("");
+  const [selectedDeliveryMonth, setSelectedDeliveryMonth] = useState(
+    () => getSavedFilters().selectedDeliveryMonth || "",
+  );
 
-  const [selectedCallStatus, setSelectedCallStatus] = useState("");
+  const [selectedCallStatus, setSelectedCallStatus] = useState(
+    () => getSavedFilters().selectedCallStatus || "",
+  );
 
   const [caseStatuses, setCaseStatuses] = useState([]);
   const [caseSubstatuses, setCaseSubstatuses] = useState([]);
 
-  const [selectedCaseStatus, setSelectedCaseStatus] = useState("");
-  const [selectedCaseSubstatus, setSelectedCaseSubstatus] = useState("");
+  const [selectedCaseStatus, setSelectedCaseStatus] = useState(
+    () => getSavedFilters().selectedCaseStatus || "",
+  );
+  const [selectedCaseSubstatus, setSelectedCaseSubstatus] = useState(
+    () => getSavedFilters().selectedCaseSubstatus || "",
+  );
 
   // ========================================
   // FETCH CHASSIS MASTER
@@ -116,8 +146,53 @@ function ChassisMaster() {
   };
 
   useEffect(() => {
-    fetchChassisMaster(1);
+    const saved = getSavedFilters();
+
+    fetchChassisMaster(
+      saved.page || 1,
+      saved.search || "",
+      saved.selectedSaleBranch || "",
+      saved.selectedDealerBranch || "",
+      saved.selectedFreePaidMonth || "",
+      saved.locationFilter || "",
+      saved.selectedSegment || "",
+      saved.selectedDeliveryMonth || "",
+      saved.selectedCallStatus || "",
+      saved.selectedCaseStatus || "",
+      saved.selectedCaseSubstatus || "",
+    );
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      CHASSIS_MASTER_STORAGE_KEY,
+      JSON.stringify({
+        page: pagination.page,
+        search,
+        selectedSaleBranch,
+        selectedDealerBranch,
+        selectedFreePaidMonth,
+        locationFilter,
+        selectedSegment,
+        selectedDeliveryMonth,
+        selectedCallStatus,
+        selectedCaseStatus,
+        selectedCaseSubstatus,
+      }),
+    );
+  }, [
+    pagination.page,
+    search,
+    selectedSaleBranch,
+    selectedDealerBranch,
+    selectedFreePaidMonth,
+    locationFilter,
+    selectedSegment,
+    selectedDeliveryMonth,
+    selectedCallStatus,
+    selectedCaseStatus,
+    selectedCaseSubstatus,
+  ]);
 
   // ========================================
   // SEARCH
@@ -131,6 +206,23 @@ function ChassisMaster() {
   const clearSearch = () => {
     setSearch("");
     fetchChassisMaster(1, "");
+  };
+
+  const clearAllFilters = () => {
+    setSearch("");
+    setSelectedSaleBranch("");
+    setSelectedDealerBranch("");
+    setSelectedFreePaidMonth("");
+    setLocationFilter("");
+    setSelectedSegment("");
+    setSelectedDeliveryMonth("");
+    setSelectedCallStatus("");
+    setSelectedCaseStatus("");
+    setSelectedCaseSubstatus("");
+
+    sessionStorage.removeItem(CHASSIS_MASTER_STORAGE_KEY);
+
+    fetchChassisMaster(1, "", "", "", "", "", "", "", "", "", "");
   };
 
   // ========================================
@@ -217,6 +309,15 @@ function ChassisMaster() {
               className={loading ? "rd-kit-sales-master-spin" : ""}
             />
             Refresh
+          </button>
+          <button
+            type="button"
+            className="rd-kit-sales-master-clear-filters"
+            onClick={clearAllFilters}
+            disabled={loading}
+          >
+            <FiX />
+            Clear Filters
           </button>
         </div>
       </div>
